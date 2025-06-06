@@ -407,16 +407,83 @@
             margin-top: 1rem;
             font-size: 0.9rem;
         }
+
+        /* Landing Page Styling */
+        #landingPage {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 700px;
+            padding: 3rem 2rem;
+            z-index: 999; /* Below modal, above main game */
+        }
+        #landingPage h2 {
+            font-size: 2.5rem;
+            color: #00FFFF;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.08em;
+        }
+        #landingPage p {
+            font-size: 1.25rem;
+            color: #00FFFF;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            letter-spacing: 0.02em;
+        }
+        #landingPage .retro-button {
+            font-size: 1.5rem;
+            padding: 1rem 3rem;
+        }
+
+        /* Responsive adjustments for landing page */
+        @media (max-width: 640px) {
+            #landingPage {
+                padding: 2rem 1rem;
+            }
+            #landingPage h2 {
+                font-size: 1.8rem;
+                margin-bottom: 1rem;
+            }
+            #landingPage p {
+                font-size: 1rem;
+                margin-bottom: 1.5rem;
+            }
+            #landingPage .retro-button {
+                font-size: 1.2rem;
+                padding: 0.8rem 2rem;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="main-wrapper">
+        <!-- New Landing Page Section -->
+        <div id="landingPage" class="retro-box hidden">
+            <h2>VELKOMMEN TIL RETRO MINISPILL ARCADE!</h2>
+            <p>
+                <span id="userDescriptionText">
+                    <!-- Brukerens beskrivelse kommer her -->
+                    Dykk inn i en verden av klassiske 1980-talls minispill med en futuristisk vri!
+                    Her kan du teste ferdighetene dine i tidløse arkadespill,
+                    utfordre venner i fartsfylte kamper, og chatte med andre spillere
+                    i vårt unike, neon-fargede terminalmiljø.
+                    Gjør deg klar for nostalgi og spenning!
+                </span>
+            </p>
+            <button class="retro-button mt-6" onclick="showAuthModal('login')">START SPILL</button>
+        </div>
+
         <div class="top-box">
             <h1>MINISPILL 1980s</h1>
             <div class="game-menu-retro">
                 <button class="retro-button" onclick="loadGame('guessTheNumber')">Gjett Tallet</button>
                 <button class="retro-button" onclick="loadGame('pongGame')">Pong</button>
                 <button class="retro-button" onclick="loadGame('snakeGame')">Snake</button>
+                <!-- Lagt til Question Game tilbake i menyen for enkel tilgang -->
+                <button class="retro-button" onclick="loadGame('questionGame')">Spørsmålsspill</button>
             </div>
         </div>
 
@@ -542,6 +609,11 @@
         onAuthStateChanged(auth, async (user) => {
             const currentNicknameDisplay = document.getElementById('currentNicknameDisplay');
             const authModal = document.getElementById('authModal');
+            const landingPage = document.getElementById('landingPage');
+            const gameArea = document.getElementById('gameArea'); 
+            const topBox = document.querySelector('.top-box'); // Get reference to top box
+            const userChatContainer = document.getElementById('userChatContainer');
+            const footer = document.querySelector('footer'); // Get reference to footer
             
             if (user) {
                 currentUserId = user.uid;
@@ -551,19 +623,29 @@
 
                 if (nicknameDocSnap.exists()) {
                     currentNickname = nicknameDocSnap.data().nickname;
+                    landingPage.classList.add('hidden'); // Hide landing page
+                    authModal.classList.add('hidden'); // Hide modal
+                    gameArea.classList.remove('hidden'); // Show game area
+                    topBox.classList.remove('hidden'); // Show top box
+                    userChatContainer.classList.remove('hidden'); // Show chat container
+                    footer.classList.remove('hidden'); // Show footer
+                    setupUserChatListener(); // Start chat listener
                 } else {
                     // If user exists but no nickname is set (e.g., migrated from anonymous or new Email/Password user without nickname)
                     // Prompt for nickname if not set
                     if (currentNicknameDisplay) currentNicknameDisplay.textContent = 'VELG NICK...'; // Show temporary state
                     showAuthModal('register', true); // Force register view to get nickname
+                    landingPage.classList.add('hidden'); // Ensure landing page is hidden
+                    gameArea.classList.add('hidden'); // Ensure game area is hidden
+                    topBox.classList.add('hidden'); // Ensure top box is hidden
+                    userChatContainer.classList.add('hidden'); // Ensure chat is hidden
+                    footer.classList.add('hidden'); // Ensure footer is hidden
                     console.warn("User logged in but no nickname found. Prompting for nickname.");
                     return; // Prevent further chat setup until nickname is chosen
                 }
 
                 if (currentNicknameDisplay) currentNicknameDisplay.textContent = currentNickname.toUpperCase();
                 console.log(`Firebase autentisert. Bruker-ID: ${currentUserId}, Kallenavn: ${currentNickname}`);
-                authModal.classList.add('hidden'); // Hide modal if logged in
-                setupUserChatListener(); // Start chat listener once authenticated and nickname set
             } else {
                 currentUserId = 'anonymous';
                 currentNickname = 'GJEST'; // Fallback
@@ -575,8 +657,13 @@
                     unsubscribeUserChat = null;
                     console.log("Chat listener unsubscribed.");
                 }
-                // Show modal if not logged in
-                showAuthModal('login');
+                // Show landing page if not logged in, hide game area and auth modal
+                gameArea.classList.add('hidden');
+                authModal.classList.add('hidden'); 
+                landingPage.classList.remove('hidden'); // Show landing page
+                topBox.classList.add('hidden'); // Ensure top box is hidden
+                userChatContainer.classList.add('hidden'); // Ensure chat is hidden
+                footer.classList.add('hidden'); // Ensure footer is hidden
             }
         });
 
@@ -585,6 +672,7 @@
         window.registerUser = registerUser;
         window.logoutUser = logoutUser;
         window.toggleAuthMode = toggleAuthMode;
+        window.showAuthModal = showAuthModal; // Expose showAuthModal for landing page button
 
         async function registerUser() {
             const email = document.getElementById('registerEmail').value;
@@ -666,7 +754,19 @@
                 // onAuthStateChanged will handle showing modal
             } catch (error) {
                 console.error("Feil ved utlogging:", error.message);
-                alert("FEIL VED UTLOGGING: " + error.message); // Use custom message box in real app
+                // Using a custom message box instead of alert()
+                const errorMessageDiv = document.createElement('div');
+                errorMessageDiv.className = "fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50";
+                errorMessageDiv.innerHTML = `
+                    <div class="retro-box p-8 max-w-sm mx-auto text-center">
+                        <p class="mb-4" style="color: #FF00FF;">FEIL VED UTLOGGING: ${error.message.toUpperCase()}</p>
+                        <button id="closeErrorBtn" class="retro-button">OK</button>
+                    </div>
+                `;
+                document.body.appendChild(errorMessageDiv);
+                document.getElementById('closeErrorBtn').onclick = () => {
+                    document.body.removeChild(errorMessageDiv);
+                };
             }
         }
 
@@ -677,8 +777,9 @@
             const authModal = document.getElementById('authModal');
             const loginSection = document.getElementById('loginSection');
             const registerSection = document.getElementById('registerSection');
+            const landingPage = document.getElementById('landingPage'); // Get reference
             
-            forceRegister = force; // Set the force flag
+            forceRegister = force;
 
             if (mode === 'login' && !forceRegister) {
                 loginSection.classList.remove('hidden');
@@ -687,6 +788,9 @@
                 loginSection.classList.add('hidden');
                 registerSection.classList.remove('hidden');
             }
+            
+            // Hide landing page when showing auth modal
+            landingPage.classList.add('hidden');
             authModal.classList.remove('hidden');
         }
 
@@ -702,12 +806,16 @@
 
 
         // --- Referanse til spillområdet ---
+        // These are now initialized based on the auth state, not hidden by default here
         const gameArea = document.getElementById('gameArea');
         const userChatContainer = document.getElementById('userChatContainer');
-        // AI Chat container er fjernet/skjult permanent i denne layouten.
+        const topBox = document.querySelector('.top-box'); // Get reference to top box
+        const footer = document.querySelector('footer'); // Get reference to footer
 
         // requestAnimationFrame ID for Pong, so it can be cancelled
         let pongAnimationFrameId = null;
+        // Flag to prevent adding multiple event listeners for Pong controls
+        let pongEventListenersAdded = false;
 
         // Funksjon for å laste et spill inn i spillområdet
         function loadGame(gameName) {
@@ -722,7 +830,7 @@
                 case 'guessTheNumber':
                     loadGuessTheNumberGame();
                     break;
-                case 'questionGame': // Denne knappen er nå fjernet fra main menu
+                case 'questionGame': 
                     loadQuestionGame();
                     break;
                 case 'retroGames': // Denne knappen er nå fjernet fra main menu
@@ -753,9 +861,13 @@
                 pongAnimationFrameId = null;
             }
             // Fjern event listeners for spillkontroller
-            document.removeEventListener('keydown', changeDirection);
-            document.removeEventListener('keydown', handlePongKeyPress);
-            document.removeEventListener('keyup', handlePongKeyRelease);
+            document.removeEventListener('keydown', changeDirection); // For Snake
+            // Only remove Pong listeners if they were actually added
+            if (pongEventListenersAdded) {
+                document.removeEventListener('keydown', handlePongKeyPress);
+                document.removeEventListener('keyup', handlePongKeyRelease);
+                pongEventListenersAdded = false; // Reset flag
+            }
         }
 
 
@@ -932,6 +1044,25 @@
             updateQuestionScore();
         }
 
+        // Added missing displayQuestion function
+        function displayQuestion() {
+            const questionDisplay = document.getElementById('questionDisplay');
+            const answerInput = document.getElementById('answerInput');
+            const answerMessage = document.getElementById('answerMessage');
+
+            if (currentQuestionIndex < questions.length) {
+                questionDisplay.textContent = questions[currentQuestionIndex].question.toUpperCase();
+                answerInput.value = '';
+                answerInput.disabled = false;
+                answerInput.focus();
+                answerMessage.textContent = ''; // Clear previous message
+            } else {
+                questionDisplay.textContent = "INGEN FLERE SPØRSMÅL! SPILL OVER.";
+                answerInput.disabled = true;
+                showNicknameInput(); // Prompt for nickname after game ends
+            }
+        }
+
         function checkQuestionAnswer() {
             const answerInput = document.getElementById('answerInput');
             const answerMessage = document.getElementById('answerMessage');
@@ -978,6 +1109,11 @@
         function resetQuestionGame() {
             initializeQuestionGame();
             document.getElementById('answerMessage').textContent = '';
+            // Remove nickname input container if it exists
+            const nicknameInputContainer = document.getElementById('nicknameInputContainer');
+            if (nicknameInputContainer) {
+                nicknameInputContainer.remove();
+            }
         }
 
         // --- Resultatliste (Leaderboard) funksjoner ---
@@ -998,10 +1134,11 @@
                 if (b.score !== a.score) {
                     return b.score - a.score;
                 }
+                // If scores are equal, sort by fewer questions asked (more efficient)
                 return a.totalQuestions - b.totalQuestions;
             });
 
-            leaderboard = leaderboard.slice(0, 5);
+            leaderboard = leaderboard.slice(0, 5); // Keep only top 5
             saveLeaderboard(leaderboard);
             loadAndDisplayLeaderboard();
         }
@@ -1031,6 +1168,12 @@
 
         function showNicknameInput() {
             const questionGameDiv = document.getElementById('questionGame');
+            // Remove existing nickname input container to prevent duplicates
+            const existingNicknameInput = document.getElementById('nicknameInputContainer');
+            if (existingNicknameInput) {
+                existingNicknameInput.remove();
+            }
+
             const nicknameInputContainer = document.createElement('div');
             nicknameInputContainer.id = 'nicknameInputContainer';
             nicknameInputContainer.className = 'mt-6 retro-box w-full max-w-md p-4';
@@ -1126,6 +1269,8 @@
             snakeCanvas = document.getElementById('snakeCanvas');
             snakeCtx = snakeCanvas.getContext('2d');
             resetSnakeGame();
+            // Ensure event listener is added only once
+            document.removeEventListener('keydown', changeDirection); // Remove existing to prevent duplicates
             document.addEventListener('keydown', changeDirection);
         }
 
@@ -1136,7 +1281,7 @@
             };
             snake.forEach(part => {
                 if (part.x === food.x && part.y === food.y) {
-                    createFood();
+                    createFood(); // Recalculate if food spawns on snake
                 }
             });
         }
@@ -1162,10 +1307,12 @@
         }
 
         function advanceSnake() {
+            // Prevent snake from moving if game isn't started (dx, dy are 0)
             if (snakeGameLoopId === null && (dx === 0 && dy === 0)) return;
 
             const head = { x: snake[0].x + dx, y: snake[0].y + dy };
 
+            // Check for collision with walls or self
             if (
                 head.x < 0 || head.x * GRID_SIZE >= snakeCanvas.width ||
                 head.y < 0 || head.y * GRID_SIZE >= snakeCanvas.height ||
@@ -1175,20 +1322,21 @@
                 return;
             }
 
-            snake.unshift(head);
+            snake.unshift(head); // Add new head
 
             const didEatFood = head.x === food.x && head.y === food.y;
             if (didEatFood) {
                 score += 10;
                 document.getElementById('snakeScore').textContent = `POENG: ${score}`;
-                createFood();
+                createFood(); // Generate new food
             } else {
-                snake.pop();
+                snake.pop(); // Remove tail if no food eaten
             }
-            changingDirection = false;
+            changingDirection = false; // Allow new direction input
         }
 
         function checkCollision(head) {
+            // Check if the new head position collides with any part of the snake's body
             for (let i = 1; i < snake.length; i++) {
                 if (head.x === snake[i].x && head.y === snake[i].y) return true;
             }
@@ -1201,6 +1349,7 @@
             const UP_KEY = 38;
             const DOWN_KEY = 40;
 
+            // Prevent rapid direction changes that can lead to immediate self-collision
             if (changingDirection) return;
             changingDirection = true;
 
@@ -1229,17 +1378,19 @@
         }
 
         function gameLoop() {
+            // Use setTimeout for a fixed game speed for Snake
             snakeGameLoopId = setTimeout(function onTick() {
                 advanceSnake();
                 draw();
                 gameLoop();
-            }, 100);
+            }, 100); // 100ms interval for movement
         }
 
         function startGame() {
+            // Start the game loop if it's not already running
             if (snakeGameLoopId === null) {
                 if (dx === 0 && dy === 0) {
-                     dx = 1;
+                     dx = 1; // Initial direction if not set
                 }
                 gameLoop();
             }
@@ -1250,26 +1401,26 @@
                 clearTimeout(snakeGameLoopId);
                 snakeGameLoopId = null;
             } else {
-                startGame();
+                startGame(); // Resume game
             }
         }
 
         function resetSnakeGame() {
-            clearTimeout(snakeGameLoopId);
+            clearTimeout(snakeGameLoopId); // Stop any active loop
             snakeGameLoopId = null;
-            snake = [{ x: 10, y: 10 }];
-            dx = 0;
+            snake = [{ x: 10, y: 10 }]; // Reset snake position
+            dx = 0; // Reset direction
             dy = 0;
-            score = 0;
+            score = 0; // Reset score
             document.getElementById('snakeScore').textContent = `POENG: ${score}`;
-            createFood();
-            draw();
+            createFood(); // Create new food
+            draw(); // Draw initial state
         }
 
         function gameOver(message) {
-            clearTimeout(snakeGameLoopId);
+            clearTimeout(snakeGameLoopId); // Stop game loop
             snakeGameLoopId = null;
-            document.getElementById('snakeScore').textContent = message;
+            document.getElementById('snakeScore').textContent = message; // Display game over message
         }
 
         // --- Pong Game ---
@@ -1279,7 +1430,7 @@
         let pongMessageElement;
         let pongScoreElement;
 
-        const keysPressed = {};
+        const keysPressed = {}; // Keep track of currently pressed keys for smooth movement
 
         function loadPongGame() {
             gameArea.innerHTML = `
@@ -1304,13 +1455,18 @@
             pongMessageElement = document.getElementById('pongMessage');
             pongScoreElement = document.getElementById('pongScore');
 
-            document.addEventListener('keydown', handlePongKeyPress);
-            document.addEventListener('keyup', handlePongKeyRelease);
+            // Add event listeners only once for Pong
+            if (!pongEventListenersAdded) {
+                document.addEventListener('keydown', handlePongKeyPress);
+                document.addEventListener('keyup', handlePongKeyRelease);
+                pongEventListenersAdded = true;
+            }
 
             resetPongGame();
         }
 
         function initPongObjects() {
+            // Initialize paddle and ball positions and properties
             paddle1 = { x: 10, y: pongCanvas.height / 2 - 30, width: 10, height: 60, dy: 0, color: '#00FFFF' }; /* Neon cyan */
             paddle2 = { x: pongCanvas.width - 20, y: pongCanvas.height / 2 - 30, width: 10, height: 60, dy: 0, color: '#FF00FF' }; /* Neon magenta */
             ball = { x: pongCanvas.width / 2, y: pongCanvas.height / 2, radius: 7, dx: 0, dy: 0, color: '#FFFF00' }; /* Neon gul */
@@ -1318,42 +1474,48 @@
 
         function resetPongGame() {
             if (pongAnimationFrameId) {
-                cancelAnimationFrame(pongAnimationFrameId);
+                cancelAnimationFrame(pongAnimationFrameId); // Stop any active animation
             }
-            pongAnimationFrameId = null;
+            pongAnimationFrameId = null; // Clear animation frame ID
 
             player1Score = 0;
             player2Score = 0;
             updatePongScore();
             pongMessageElement.textContent = "TRYKK 'START SPILL' FOR Å BEGYNNE!";
-            initPongObjects();
-            drawPong();
+            initPongObjects(); // Re-initialize positions
+            drawPong(); // Draw initial state
         }
 
         function serveBall() {
+            // Reset ball position to center and give it a random initial direction
             ball.x = pongCanvas.width / 2;
             ball.y = pongCanvas.height / 2;
+            // Random horizontal direction (left or right) and some vertical angle
             ball.dx = (Math.random() > 0.5 ? 3 : -3) * (Math.random() > 0.5 ? 1 : 1);
             ball.dy = (Math.random() * 2 - 1) * 2;
         }
 
         function drawPong() {
+            // Clear canvas and draw background
             pongCtx.fillStyle = 'black';
             pongCtx.fillRect(0, 0, pongCanvas.width, pongCanvas.height);
 
+            // Draw middle line
             pongCtx.strokeStyle = '#00FFFF'; /* Neon cyan midtlinje */
             pongCtx.beginPath();
-            pongCtx.setLineDash([5, 5]);
+            pongCtx.setLineDash([5, 5]); // Dashed line
             pongCtx.moveTo(pongCanvas.width / 2, 0);
             pongCtx.lineTo(pongCanvas.width / 2, pongCanvas.height);
             pongCtx.stroke();
-            pongCtx.setLineDash([]);
+            pongCtx.setLineDash([]); // Reset line dash for other drawings
 
+            // Draw paddles
             pongCtx.fillStyle = paddle1.color;
             pongCtx.fillRect(paddle1.x, paddle1.y, paddle1.width, paddle1.height);
             pongCtx.fillStyle = paddle2.color;
             pongCtx.fillRect(paddle2.x, paddle2.y, paddle2.width, paddle2.height);
 
+            // Draw ball
             pongCtx.beginPath();
             pongCtx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
             pongCtx.fillStyle = ball.color;
@@ -1361,55 +1523,65 @@
         }
 
         function updatePong() {
+            // Update paddle positions based on their velocity
             paddle1.y += paddle1.dy;
             paddle2.y += paddle2.dy;
 
+            // Keep paddles within canvas bounds
             if (paddle1.y < 0) paddle1.y = 0;
             if (paddle1.y + paddle1.height > pongCanvas.height) paddle1.y = pongCanvas.height - paddle1.height;
             if (paddle2.y < 0) paddle2.y = 0;
             if (paddle2.y + paddle2.height > pongCanvas.height) paddle2.y = pongCanvas.height - paddle2.height;
 
+            // Update ball position
             ball.x += ball.dx;
             ball.y += ball.dy;
 
+            // Bounce ball off top/bottom walls
             if (ball.y - ball.radius < 0 || ball.y + ball.radius > pongCanvas.height) {
                 ball.dy = -ball.dy;
             }
 
-            if (ball.dx < 0 &&
-                ball.x - ball.radius < paddle1.x + paddle1.width &&
-                ball.y > paddle1.y &&
+            // Ball collision with paddles
+            // Paddle 1 (left)
+            if (ball.dx < 0 && // Moving left
+                ball.x - ball.radius < paddle1.x + paddle1.width && // Colliding with paddle's right edge
+                ball.y > paddle1.y && // Ball is within paddle's vertical range
                 ball.y < paddle1.y + paddle1.height) {
-                ball.dx = -ball.dx;
+                ball.dx = -ball.dx; // Reverse horizontal direction
+                // Adjust vertical bounce based on where it hit the paddle
                 let collidePoint = ball.y - (paddle1.y + paddle1.height / 2);
-                collidePoint = collidePoint / (paddle1.height / 2);
-                ball.dy = collidePoint * 5;
+                collidePoint = collidePoint / (paddle1.height / 2); // Normalize value between -1 and 1
+                ball.dy = collidePoint * 5; // Adjust vertical speed
             }
-            else if (ball.dx > 0 &&
-                     ball.x + ball.radius > paddle2.x &&
-                     ball.y > paddle2.y &&
+            // Paddle 2 (right)
+            else if (ball.dx > 0 && // Moving right
+                     ball.x + ball.radius > paddle2.x && // Colliding with paddle's left edge
+                     ball.y > paddle2.y && // Ball is within paddle's vertical range
                      ball.y < paddle2.y + paddle2.height) {
-                ball.dx = -ball.dx;
+                ball.dx = -ball.dx; // Reverse horizontal direction
+                // Adjust vertical bounce based on where it hit the paddle
                 let collidePoint = ball.y - (paddle2.y + paddle2.height / 2);
-                collidePoint = collidePoint / (paddle2.height / 2);
-                ball.dy = collidePoint * 5;
+                collidePoint = collidePoint / (paddle2.height / 2); // Normalize value
+                ball.dy = collidePoint * 5; // Adjust vertical speed
             }
 
-            if (ball.x - ball.radius < 0) {
+            // Check for scoring (ball goes past paddles)
+            if (ball.x - ball.radius < 0) { // Player 2 scores
                 player2Score++;
                 updatePongScore();
                 if (player2Score >= 5) {
                     gameOverPong("SPILLER 2 VANT! 🏆");
                 } else {
-                    serveBall();
+                    serveBall(); // Serve new ball
                 }
-            } else if (ball.x + ball.radius > pongCanvas.width) {
+            } else if (ball.x + ball.radius > pongCanvas.width) { // Player 1 scores
                 player1Score++;
                 updatePongScore();
                 if (player1Score >= 5) {
                     gameOverPong("SPILLER 1 VANT! 🏆");
                 } else {
-                    serveBall();
+                    serveBall(); // Serve new ball
                 }
             }
         }
@@ -1420,60 +1592,65 @@
 
         function gameOverPong(message) {
             if (pongAnimationFrameId) {
-                cancelAnimationFrame(pongAnimationFrameId);
+                cancelAnimationFrame(pongAnimationFrameId); // Stop game loop
                 pongAnimationFrameId = null;
             }
-            pongMessageElement.textContent = message;
+            pongMessageElement.textContent = message; // Display game over/win message
         }
 
         function pongGameLoop() {
-            updatePong();
-            drawPong();
-            pongAnimationFrameId = requestAnimationFrame(pongGameLoop);
+            updatePong(); // Update game state
+            drawPong(); // Draw elements
+            pongAnimationFrameId = requestAnimationFrame(pongGameLoop); // Loop recursively
         }
 
         function startGamePong() {
             if (pongAnimationFrameId) {
-                return;
+                return; // Prevent multiple game loops from running
             }
-            pongMessageElement.textContent = "";
-            serveBall();
-            pongGameLoop();
+            pongMessageElement.textContent = ""; // Clear any previous messages
+            serveBall(); // Start the ball
+            pongGameLoop(); // Begin the game loop
         }
 
         function handlePongKeyPress(event) {
-            keysPressed[event.key] = true;
-            if (pongAnimationFrameId === null) return;
+            keysPressed[event.key] = true; // Mark key as pressed
+            if (pongAnimationFrameId === null) return; // Only process if game is running
 
+            // Player 1 controls (W/S)
             if (keysPressed['w'] || keysPressed['W']) {
-                paddle1.dy = -5;
+                paddle1.dy = -5; // Move up
             } else if (keysPressed['s'] || keysPressed['S']) {
-                paddle1.dy = 5;
+                paddle1.dy = 5; // Move down
             }
 
+            // Player 2 controls (ArrowUp/ArrowDown)
             if (keysPressed['ArrowUp']) {
-                paddle2.dy = -5;
+                paddle2.dy = -5; // Move up
             } else if (keysPressed['ArrowDown']) {
-                paddle2.dy = 5;
+                paddle2.dy = 5; // Move down
             }
         }
 
         function handlePongKeyRelease(event) {
-            keysPressed[event.key] = false;
+            keysPressed[event.key] = false; // Mark key as released
 
+            // Stop paddle movement if relevant key is released
+            // For paddle1
             if (!(keysPressed['w'] || keysPressed['W'] || keysPressed['s'] || keysPressed['S'])) {
                 paddle1.dy = 0;
-            } else if (keysPressed['w'] || keysPressed['W']) {
+            } else if (keysPressed['w'] || keysPressed['W']) { // If 'w' is still pressed after 's' is released
                 paddle1.dy = -5;
-            } else if (keysPressed['s'] || keysPressed['S']) {
+            } else if (keysPressed['s'] || keysPressed['S']) { // If 's' is still pressed after 'w' is released
                 paddle1.dy = 5;
             }
 
+            // For paddle2
             if (!(keysPressed['ArrowUp'] || keysPressed['ArrowDown'])) {
                 paddle2.dy = 0;
-            } else if (keysPressed['ArrowUp']) {
+            } else if (keysPressed['ArrowUp']) { // If 'ArrowUp' is still pressed after 'ArrowDown' is released
                 paddle2.dy = -5;
-            } else if (keysPressed['ArrowDown']) {
+            } else if (keysPressed['ArrowDown']) { // If 'ArrowDown' is still pressed after 'ArrowUp' is released
                 paddle2.dy = 5;
             }
         }
@@ -1488,7 +1665,7 @@
         function loadAIChatHistory() { /* No-op in this UI */ }
         function saveAIChatHistory() { /* No-op in this UI */ }
         function resetAIChat() { /* No-op in this UI */ }
-        async function sendMessage() { /* No-op in this UI */ }
+        async function sendMessage() { /* No-op in this UI */ return Promise.resolve(); } // Return a promise
         async function googleSearch(queries) { /* No-op in this UI */ return []; }
 
         // --- Bruker Chat (Firestore) ---
@@ -1498,14 +1675,18 @@
             if (nicknameCache[userId]) {
                 return nicknameCache[userId];
             }
-            const nicknameDocRef = doc(db, `artifacts/${appId}/public/data/nicknames`, userId);
-            const nicknameDocSnap = await getDoc(nicknameDocRef);
-            if (nicknameDocSnap.exists()) {
-                const nickname = nicknameDocSnap.data().nickname;
-                nicknameCache[userId] = nickname; // Store in cache
-                return nickname;
+            try {
+                const nicknameDocRef = doc(db, `artifacts/${appId}/public/data/nicknames`, userId);
+                const nicknameDocSnap = await getDoc(nicknameDocRef);
+                if (nicknameDocSnap.exists()) {
+                    const nickname = nicknameDocSnap.data().nickname;
+                    nicknameCache[userId] = nickname; // Store in cache
+                    return nickname;
+                }
+            } catch (error) {
+                console.error("Feil ved henting av kallenavn fra Firestore:", error);
             }
-            return 'UKJENT'; // Fallback if nickname not found
+            return 'UKJENT'; // Fallback if nickname not found or error occurs
         }
 
 
@@ -1531,6 +1712,7 @@
                 userChatOutput.scrollTop = userChatOutput.scrollHeight;
             }).catch(error => {
                 console.error("Error fetching nickname for message:", error);
+                // Fallback display if nickname fetching fails
                 messageDiv.className = `chat-message ${messageClass}`;
                 messageDiv.innerHTML = `<span class="font-bold text-xs">FEIL BRUKER</span> <span class="text-xs text-gray-200">${date}</span><br>${message.toUpperCase()}`;
                 userChatOutput.appendChild(messageDiv);
@@ -1555,7 +1737,7 @@
                 return;
             }
 
-            // Unsubscribe existing listener if any
+            // Unsubscribe existing listener if any to avoid multiple listeners
             if (unsubscribeUserChat) {
                 unsubscribeUserChat();
                 unsubscribeUserChat = null;
@@ -1565,11 +1747,12 @@
 
 
             const chatCollectionRef = window.collection(window.db, `artifacts/${window.__app_id}/public/data/user_chats`);
-            const q = window.query(chatCollectionRef, window.orderBy('timestamp', 'asc'));
+            // orderBy is commented out as per instructions to avoid potential index issues unless explicitly needed and indexed
+            const q = window.query(chatCollectionRef /*, window.orderBy('timestamp', 'asc')*/); 
 
             unsubscribeUserChat = window.onSnapshot(q, (snapshot) => {
                 const userChatOutput = document.getElementById('userChatOutput');
-                userChatOutput.innerHTML = ''; // Clear to reload all messages
+                userChatOutput.innerHTML = ''; // Clear to reload all messages on snapshot change
                 snapshot.forEach((doc) => {
                     const data = doc.data();
                     displayUserChatMessage(data.message, data.userId, data.timestamp);
@@ -1594,9 +1777,16 @@
             }
             if (!window.auth.currentUser) {
                 console.warn("Bruker er ikke autentisert. Kan ikke sende melding.");
-                // Optionally show a message to the user that they need to log in
-                document.getElementById('userChatOutput').appendChild(document.createElement('div')).outerHTML = 
-                    `<div class="chat-message user-chat-message" style="color: #FF00FF;">FEIL: DU MÅ VÆRE LOGGET INN FOR Å SENDE MELDINGER.</div>`;
+                // Show a message to the user that they need to log in
+                const chatOutput = document.getElementById('userChatOutput');
+                if (chatOutput) {
+                    const msgDiv = document.createElement('div');
+                    msgDiv.className = `chat-message user-chat-message`;
+                    msgDiv.style.color = '#FF00FF'; // Magenta for error
+                    msgDiv.innerHTML = `FEIL: DU MÅ VÆRE LOGGET INN FOR Å SENDE MELDINGER.`;
+                    chatOutput.appendChild(msgDiv);
+                    chatOutput.scrollTop = chatOutput.scrollHeight;
+                }
                 return;
             }
 
@@ -1613,8 +1803,15 @@
                 });
             } catch (error) {
                 console.error("Feil ved sending av melding:", error);
-                document.getElementById('userChatOutput').appendChild(document.createElement('div')).outerHTML = 
-                    `<div class="chat-message user-chat-message" style="color: #FF00FF;">FEIL VED SENDING AV MELDING.</div>`;
+                const chatOutput = document.getElementById('userChatOutput');
+                if (chatOutput) {
+                    const msgDiv = document.createElement('div');
+                    msgDiv.className = `chat-message user-chat-message`;
+                    msgDiv.style.color = '#FF00FF'; // Magenta for error
+                    msgDiv.innerHTML = `FEIL VED SENDING AV MELDING: ${error.message.toUpperCase()}`;
+                    chatOutput.appendChild(msgDiv);
+                    chatOutput.scrollTop = chatOutput.scrollHeight;
+                }
             } finally {
                 userChatSendButton.disabled = false;
                 userChatLoadingIndicator.classList.add('hidden');
@@ -1679,10 +1876,13 @@
 
         // Laster "Gjett Tallet"-spillet automatisk når siden lastes som standard
         window.onload = () => {
-            // Initialiserer spillområdet først
-            loadGame('guessTheNumber');
-            // onAuthStateChanged vil deretter håndtere visning av autentiseringsmodalen
-            // og oppsett av chat-lytteren når brukeren er logget inn/registrert.
+            // Initialiserer spillområdet, auth modal, og landing page for å kontrollere visning
+            document.getElementById('landingPage').classList.remove('hidden'); // Show landing page initially
+            document.getElementById('authModal').classList.add('hidden'); // Hide auth modal
+            gameArea.classList.add('hidden'); // Hide game area
+            topBox.classList.add('hidden'); // Hide top box
+            userChatContainer.classList.add('hidden'); // Hide chat container
+            footer.classList.add('hidden'); // Hide footer
         };
 
     </script>
