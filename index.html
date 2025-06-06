@@ -307,6 +307,53 @@
             color: #34d399;
         }
 
+        /* Pong Game Canvas */
+        #pongCanvas {
+            background-color: #000000; /* Svart bakgrunn for Pong */
+            border: 2px solid #e0e7ff; /* Lys kant */
+            border-radius: 0.5rem;
+        }
+        #pongGameControls {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        #pongGameControls button {
+            background-image: linear-gradient(to right, #dc2626, #ef4444); /* Rød gradient */
+            color: white;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            font-weight: 600;
+            transition: all 0.2s ease-in-out;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        #pongGameControls button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        #pongScore {
+            margin-top: 1rem;
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #e0e7ff;
+        }
+        #pongMessage {
+            color: #facc15; /* Gul for meldinger */
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+        .pong-controls-info {
+            text-align: center;
+            margin-top: 1rem;
+            color: #9ca3af;
+            font-size: 0.9rem;
+        }
+
+
         /* AI Chat spesifikke stiler */
         #aiChat {
             background-color: #2d3748; /* Mørkere grå for chat-bakgrunn */
@@ -432,7 +479,7 @@
             #questionGame input[type="text"] {
                 max-width: 100%;
             }
-            #snakeCanvas {
+            #snakeCanvas, #pongCanvas {
                 width: 100%;
                 height: auto; /* Justeres basert på aspect ratio */
             }
@@ -481,6 +528,9 @@
         // Referanse til spillområdet
         const gameArea = document.getElementById('gameArea');
 
+        // requestAnimationFrame ID for Pong, so it can be cancelled
+        let pongAnimationFrameId = null;
+
         // Funksjon for å laste et spill inn i spillområdet
         function loadGame(gameName) {
             gameArea.innerHTML = ''; // Tømmer spillområdet
@@ -500,8 +550,8 @@
                 case 'snakeGame': // Spesifikt for Snake, lastes fra retroGames menu
                     loadSnakeGame();
                     break;
-                case 'aiChat':
-                    loadAIChat();
+                case 'pongGame': // Spesifikt for Pong, lastes fra retroGames menu
+                    loadPongGame();
                     break;
                 case 'anotherGame':
                     gameArea.innerHTML = '<h2 class="text-2xl text-yellow-400">Dette spillet kommer snart!</h2><p class="mt-2 text-gray-300">Følg med for mer moro.</p>';
@@ -518,7 +568,15 @@
                 clearTimeout(snakeGameLoopId);
                 snakeGameLoopId = null;
             }
+            // Pong game loop
+            if (pongAnimationFrameId) {
+                cancelAnimationFrame(pongAnimationFrameId);
+                pongAnimationFrameId = null;
+            }
             // Legg til andre spill-looper her hvis de bruker requestAnimationFrame eller setInterval/setTimeout
+            document.removeEventListener('keydown', changeDirection); // Fjern snake controls
+            document.removeEventListener('keydown', handlePongKeyPress); // Fjern pong controls
+            document.removeEventListener('keyup', handlePongKeyRelease); // Fjern pong controls
         }
 
 
@@ -874,25 +932,47 @@
         // --- Retro Games Menu ---
         function loadRetroGamesMenu() {
             gameArea.innerHTML = `
-                <div class="retro-game-menu">
+                <div class="retro-game-menu w-full max-w-2xl">
+                    <h2 class="text-3xl font-bold text-blue-300 mb-6 w-full text-center">90-talls Retro Spill</h2>
                     <button class="retro-game-button" onclick="loadGame('snakeGame')">Snake</button>
+                    <button class="retro-game-button" onclick="loadGame('pongGame')">Pong</button>
                     <button class="retro-game-button" disabled>Tetris Lite (kommer)</button>
                     <button class="retro-game-button" disabled>Pac-Man Lite (kommer)</button>
-                    <button class="retro-game-button" disabled>Asteroids Lite (kommer)</button>
+                    <button class="retro-game-button" disabled>Space Invaders Lite (kommer)</button>
+                    <button class="retro-game-button" disabled>Brick Breaker (kommer)</button>
+                    <button class="retro-game-button" disabled>Frogger Lite (kommer)</button>
+                    <button class="retro-game-button" disabled>Connect Four (kommer)</button>
+                    <button class="retro-game-button" disabled>Tic-Tac-Toe (kommer)</button>
+                    <button class="retro-game-button" disabled>Minesweeper Lite (kommer)</button>
+                    <button class="retro-game-button" disabled>Simon Says (kommer)</button>
+                    <button class="retro-game-button" disabled>Whack-A-Mole (kommer)</button>
+                    <button class="retro-game-button" disabled>Flappy Bird (kommer)</button>
+                    <button class="retro-game-button" disabled>Crossy Road (kommer)</button>
+                    <button class="retro-game-button" disabled>Endless Runner (kommer)</button>
+                    <button class="retro-game-button" disabled>Pinball Lite (kommer)</button>
+                    <button class="retro-game-button" disabled>Hangman (kommer)</button>
+                    <button class="retro-game-button" disabled>Guess the Word (kommer)</button>
+                    <button class="retro-game-button" disabled>Rock-Paper-Scissors (kommer)</button>
+                    <button class="retro-game-button" disabled>Memory Game (kommer)</button>
+                    <button class="retro-game-button" disabled>Sudoku (kommer)</button>
+                    <button class="retro-game-button" disabled>Battleship Lite (kommer)</button>
+                    <button class="retro-game-button" disabled>Mastermind (kommer)</button>
+                    <button class="retro-game-button" disabled>2048 (kommer)</button>
+                    <button class="retro-game-button" disabled>Doodle Jump (kommer)</button>
                 </div>
             `;
         }
 
         // --- Snake Game ---
         let snakeCanvas, snakeCtx;
-        const GRID_SIZE = 20; // Size of each square in the grid
+        const GRID_SIZE = 20; // Størrelse på hver rute i rutenettet
         let snake = [{ x: 10, y: 10 }];
         let food = {};
-        let dx = 0; // x velocity
-        let dy = 0; // y velocity
+        let dx = 0; // x hastighet
+        let dy = 0; // y hastighet
         let score = 0;
         let changingDirection = false;
-        let snakeGameLoopId = null; // To store setTimeout ID for pausing/resetting
+        let snakeGameLoopId = null; // Lagrer setTimeout ID for pausing/resetting
 
         function loadSnakeGame() {
             gameArea.innerHTML = `
@@ -909,8 +989,8 @@
             `;
             snakeCanvas = document.getElementById('snakeCanvas');
             snakeCtx = snakeCanvas.getContext('2d');
-            resetSnakeGame(); // Initialize game state
-            document.addEventListener('keydown', changeDirection); // Listen for arrow keys
+            resetSnakeGame(); // Initialiser spilltilstand
+            document.addEventListener('keydown', changeDirection); // Lytt etter piltaster
         }
 
         function createFood() {
@@ -918,10 +998,10 @@
                 x: Math.floor(Math.random() * (snakeCanvas.width / GRID_SIZE)),
                 y: Math.floor(Math.random() * (snakeCanvas.height / GRID_SIZE))
             };
-            // Ensure food does not spawn on the snake
+            // Sørg for at mat ikke dukker opp på slangen
             snake.forEach(part => {
                 if (part.x === food.x && part.y === food.y) {
-                    createFood(); // Recurse if food is on snake
+                    createFood(); // Rekursivt hvis mat er på slangen
                 }
             });
         }
@@ -947,35 +1027,35 @@
         }
 
         function advanceSnake() {
-            if (!snakeGameLoopId && (dx === 0 && dy === 0)) return; // Game paused/not started
+            if (snakeGameLoopId === null && (dx === 0 && dy === 0)) return; // Spill pauset/ikke startet
 
             const head = { x: snake[0].x + dx, y: snake[0].y + dy };
 
-            // Check for collision with walls or self
+            // Sjekk for kollisjon med vegger eller seg selv
             if (
                 head.x < 0 || head.x * GRID_SIZE >= snakeCanvas.width ||
                 head.y < 0 || head.y * GRID_SIZE >= snakeCanvas.height ||
                 checkCollision(head)
             ) {
-                gameOver();
+                gameOver("Game Over! Ditt poeng: " + score);
                 return;
             }
 
-            snake.unshift(head); // Add new head
+            snake.unshift(head); // Legg til nytt hode
 
             const didEatFood = head.x === food.x && head.y === food.y;
             if (didEatFood) {
                 score += 10;
                 document.getElementById('snakeScore').textContent = `Poeng: ${score}`;
-                createFood(); // Create new food
+                createFood(); // Lag ny mat
             } else {
-                snake.pop(); // Remove tail if no food eaten
+                snake.pop(); // Fjern hale hvis ingen mat spist
             }
             changingDirection = false;
         }
 
         function checkCollision(head) {
-            // Check if snake head collides with any part of its body
+            // Sjekk om slangens hode kolliderer med noen del av kroppen
             for (let i = 1; i < snake.length; i++) {
                 if (head.x === snake[i].x && head.y === snake[i].y) return true;
             }
@@ -988,7 +1068,7 @@
             const UP_KEY = 38;
             const DOWN_KEY = 40;
 
-            if (changingDirection) return; // Prevent rapid multiple key presses
+            if (changingDirection) return; // Forhindre raske, flere tastetrykk
             changingDirection = true;
 
             const keyPressed = event.keyCode;
@@ -1019,14 +1099,14 @@
             snakeGameLoopId = setTimeout(function onTick() {
                 advanceSnake();
                 draw();
-                gameLoop(); // Call itself recursively
-            }, 100); // Game speed (lower is faster)
+                gameLoop(); // Kall seg selv rekursivt
+            }, 100); // Spillhastighet (lavere er raskere)
         }
 
         function startGame() {
-            if (snakeGameLoopId === null) { // Only start if not already running
-                if (dx === 0 && dy === 0) { // If game just reset or never started, give initial direction
-                     dx = 1; // Start moving right
+            if (snakeGameLoopId === null) { // Start kun hvis ikke allerede kjører
+                if (dx === 0 && dy === 0) { // Hvis spillet nettopp ble tilbakestilt eller aldri startet, gi en startretning
+                     dx = 1; // Start bevegelse til høyre
                 }
                 gameLoop();
             }
@@ -1037,27 +1117,257 @@
                 clearTimeout(snakeGameLoopId);
                 snakeGameLoopId = null;
             } else {
-                startGame(); // Resume
+                startGame(); // Fortsett
             }
         }
 
         function resetSnakeGame() {
-            clearTimeout(snakeGameLoopId); // Stop current game loop
+            clearTimeout(snakeGameLoopId); // Stopp nåværende spill-loop
             snakeGameLoopId = null;
-            snake = [{ x: 10, y: 10 }]; // Reset snake position
-            dx = 0; // Reset direction
+            snake = [{ x: 10, y: 10 }]; // Tilbakestill slangens posisjon
+            dx = 0; // Tilbakestill retning
             dy = 0;
             score = 0;
             document.getElementById('snakeScore').textContent = `Poeng: ${score}`;
-            createFood(); // Place new food
-            draw(); // Initial draw
+            createFood(); // Plasser ny mat
+            draw(); // Første tegning
         }
 
-        function gameOver() {
+        function gameOver(message) {
             clearTimeout(snakeGameLoopId);
             snakeGameLoopId = null;
-            alert("Game Over! Ditt poeng: " + score); // Simple alert for now
-            resetSnakeGame();
+            // Erstatt alert med en melding i UI
+            document.getElementById('snakeScore').textContent = message;
+            // resetSnakeGame(); // Tilbakestill spillet automatisk etter melding
+        }
+
+        // --- Pong Game ---
+        let pongCanvas, pongCtx;
+        let paddle1, paddle2, ball;
+        let player1Score, player2Score;
+        let pongGameLoopId = null; // For requestAnimationFrame
+        let pongMessageElement;
+        let pongScoreElement;
+
+        // Kontrollflagg for å håndtere vedvarende tastetrykk
+        const keysPressed = {};
+
+        function loadPongGame() {
+            gameArea.innerHTML = `
+                <div id="pongGame" class="w-full max-w-lg bg-gray-800 p-6 rounded-xl shadow-lg flex flex-col items-center">
+                    <h2 class="text-2xl font-bold text-red-400 mb-4">Pong</h2>
+                    <canvas id="pongCanvas" width="500" height="300" class="border-2 border-red-500 rounded-lg"></canvas>
+                    <div id="pongGameControls" class="mt-4 flex gap-4">
+                        <button onclick="startGamePong()">Start Spill</button>
+                        <button onclick="resetPongGame()">Nytt Spill</button>
+                    </div>
+                    <p id="pongScore" class="mt-4 text-xl font-bold text-red-300">Poeng: Spiller 1: 0 - Spiller 2: 0</p>
+                    <p id="pongMessage" class="mt-2 text-lg text-yellow-300"></p>
+                    <div class="pong-controls-info">
+                        <p>Kontroller:</p>
+                        <p>Spiller 1 (venstre): W (opp), S (ned)</p>
+                        <p>Spiller 2 (høyre): Pil opp, Pil ned</p>
+                    </div>
+                </div>
+            `;
+            pongCanvas = document.getElementById('pongCanvas');
+            pongCtx = pongCanvas.getContext('2d');
+            pongMessageElement = document.getElementById('pongMessage');
+            pongScoreElement = document.getElementById('pongScore');
+
+            // Legg til tastaturlyttere
+            document.addEventListener('keydown', handlePongKeyPress);
+            document.addEventListener('keyup', handlePongKeyRelease);
+
+            resetPongGame();
+        }
+
+        function initPongObjects() {
+            // Paddle setup
+            paddle1 = { x: 10, y: pongCanvas.height / 2 - 30, width: 10, height: 60, dy: 0, color: '#06b6d4' };
+            paddle2 = { x: pongCanvas.width - 20, y: pongCanvas.height / 2 - 30, width: 10, height: 60, dy: 0, color: '#f87171' };
+
+            // Ball setup
+            ball = { x: pongCanvas.width / 2, y: pongCanvas.height / 2, radius: 7, dx: 0, dy: 0, color: '#e0e7ff' };
+        }
+
+        function resetPongGame() {
+            if (pongAnimationFrameId) {
+                cancelAnimationFrame(pongAnimationFrameId);
+            }
+            pongAnimationFrameId = null;
+
+            player1Score = 0;
+            player2Score = 0;
+            updatePongScore();
+            pongMessageElement.textContent = "Trykk 'Start Spill' for å begynne!";
+            initPongObjects(); // Tilbakestill posisjoner
+            drawPong();
+        }
+
+        function serveBall() {
+            ball.x = pongCanvas.width / 2;
+            ball.y = pongCanvas.height / 2;
+            ball.dx = (Math.random() > 0.5 ? 3 : -3) * (Math.random() > 0.5 ? 1 : 1); // Start med tilfeldig retning
+            ball.dy = (Math.random() * 2 - 1) * 2; // Litt tilfeldig vertikal retning
+        }
+
+        function drawPong() {
+            // Bakgrunn
+            pongCtx.fillStyle = 'black';
+            pongCtx.fillRect(0, 0, pongCanvas.width, pongCanvas.height);
+
+            // Midtlinje
+            pongCtx.strokeStyle = '#6b7280';
+            pongCtx.beginPath();
+            pongCtx.setLineDash([5, 5]);
+            pongCtx.moveTo(pongCanvas.width / 2, 0);
+            pongCtx.lineTo(pongCanvas.width / 2, pongCanvas.height);
+            pongCtx.stroke();
+            pongCtx.setLineDash([]); // Tilbakestill
+
+            // Paddles
+            pongCtx.fillStyle = paddle1.color;
+            pongCtx.fillRect(paddle1.x, paddle1.y, paddle1.width, paddle1.height);
+            pongCtx.fillStyle = paddle2.color;
+            pongCtx.fillRect(paddle2.x, paddle2.y, paddle2.width, paddle2.height);
+
+            // Ball
+            pongCtx.beginPath();
+            pongCtx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            pongCtx.fillStyle = ball.color;
+            pongCtx.fill();
+        }
+
+        function updatePong() {
+            // Flytt paddles
+            paddle1.y += paddle1.dy;
+            paddle2.y += paddle2.dy;
+
+            // Hold paddles innenfor grenser
+            if (paddle1.y < 0) paddle1.y = 0;
+            if (paddle1.y + paddle1.height > pongCanvas.height) paddle1.y = pongCanvas.height - paddle1.height;
+            if (paddle2.y < 0) paddle2.y = 0;
+            if (paddle2.y + paddle2.height > pongCanvas.height) paddle2.y = pongCanvas.height - paddle2.height;
+
+            // Flytt ball
+            ball.x += ball.dx;
+            ball.y += ball.dy;
+
+            // Ball kollisjon med topp/bunn vegger
+            if (ball.y - ball.radius < 0 || ball.y + ball.radius > pongCanvas.height) {
+                ball.dy = -ball.dy;
+            }
+
+            // Ball kollisjon med paddles
+            // Spiller 1 (venstre)
+            if (ball.dx < 0 &&
+                ball.x - ball.radius < paddle1.x + paddle1.width &&
+                ball.y > paddle1.y &&
+                ball.y < paddle1.y + paddle1.height) {
+                ball.dx = -ball.dx; // Reverser x-retning
+                // Juster y-retning basert på hvor på paddle den traff
+                let collidePoint = ball.y - (paddle1.y + paddle1.height / 2);
+                collidePoint = collidePoint / (paddle1.height / 2); // Normaliser til -1 til 1
+                ball.dy = collidePoint * 5; // Hastighet
+            }
+            // Spiller 2 (høyre)
+            else if (ball.dx > 0 &&
+                     ball.x + ball.radius > paddle2.x &&
+                     ball.y > paddle2.y &&
+                     ball.y < paddle2.y + paddle2.height) {
+                ball.dx = -ball.dx; // Reverser x-retning
+                let collidePoint = ball.y - (paddle2.y + paddle2.height / 2);
+                collidePoint = collidePoint / (paddle2.height / 2);
+                ball.dy = collidePoint * 5;
+            }
+
+            // Ball utenfor banen (poeng)
+            if (ball.x - ball.radius < 0) {
+                player2Score++;
+                updatePongScore();
+                if (player2Score >= 5) {
+                    gameOverPong("Spiller 2 vant! 🏆");
+                } else {
+                    serveBall(); // Ny serve
+                }
+            } else if (ball.x + ball.radius > pongCanvas.width) {
+                player1Score++;
+                updatePongScore();
+                if (player1Score >= 5) {
+                    gameOverPong("Spiller 1 vant! 🏆");
+                } else {
+                    serveBall(); // Ny serve
+                }
+            }
+        }
+
+        function updatePongScore() {
+            pongScoreElement.textContent = `Poeng: Spiller 1: ${player1Score} - Spiller 2: ${player2Score}`;
+        }
+
+        function gameOverPong(message) {
+            if (pongAnimationFrameId) {
+                cancelAnimationFrame(pongAnimationFrameId);
+                pongAnimationFrameId = null;
+            }
+            pongMessageElement.textContent = message;
+        }
+
+        function pongGameLoop() {
+            updatePong();
+            drawPong();
+            pongAnimationFrameId = requestAnimationFrame(pongGameLoop);
+        }
+
+        function startGamePong() {
+            if (pongAnimationFrameId) { // If already running, do nothing
+                return;
+            }
+            pongMessageElement.textContent = "";
+            serveBall(); // Start med å serve ballen
+            pongGameLoop();
+        }
+
+        function handlePongKeyPress(event) {
+            keysPressed[event.key] = true;
+            if (pongAnimationFrameId === null) return; // Ikke beveg paddles hvis spillet ikke kjører
+
+            // Player 1 controls (W, S)
+            if (keysPressed['w'] || keysPressed['W']) {
+                paddle1.dy = -5;
+            } else if (keysPressed['s'] || keysPressed['S']) {
+                paddle1.dy = 5;
+            }
+
+            // Player 2 controls (ArrowUp, ArrowDown)
+            if (keysPressed['ArrowUp']) {
+                paddle2.dy = -5;
+            } else if (keysPressed['ArrowDown']) {
+                paddle2.dy = 5;
+            }
+        }
+
+        function handlePongKeyRelease(event) {
+            keysPressed[event.key] = false;
+
+            // Player 1
+            if (!(keysPressed['w'] || keysPressed['W'] || keysPressed['s'] || keysPressed['S'])) {
+                paddle1.dy = 0;
+            } else if (keysPressed['w'] || keysPressed['W']) { // If 'w' or 'W' is still pressed after 's' is released
+                paddle1.dy = -5;
+            } else if (keysPressed['s'] || keysPressed['S']) { // If 's' or 'S' is still pressed after 'w' is released
+                paddle1.dy = 5;
+            }
+
+            // Player 2
+            if (!(keysPressed['ArrowUp'] || keysPressed['ArrowDown'])) {
+                paddle2.dy = 0;
+            } else if (keysPressed['ArrowUp']) { // If 'ArrowUp' is still pressed after 'ArrowDown' is released
+                paddle2.dy = -5;
+            } else if (keysPressed['ArrowDown']) { // If 'ArrowDown' is still pressed after 'ArrowUp' is released
+                paddle2.dy = 5;
+            }
         }
 
         // --- AI Chat ---
