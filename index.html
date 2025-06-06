@@ -7,11 +7,11 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Grunnleggende kropp og bakgrunn for 1980s terminalfølelse */
+        /* Custom styles for the 1980s terminal feel */
         body {
-            font-family: 'monospace', sans-serif; /* Retro terminal-font */
-            background-color: #000000; /* Dyp svart bakgrunn */
-            color: #00FFFF; /* Neon cyan/blå for all tekst */
+            font-family: 'monospace', sans-serif; /* Retro terminal font */
+            background-color: #000000; /* Deep black fallback background */
+            color: #00FFFF; /* Neon cyan/blue for all text */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -19,43 +19,47 @@
             padding: 1.5rem;
             box-sizing: border-box;
             /* Subtil retro-effekt (simulerer scanlines/støy) */
+            /* The generated background image will be added as the first layer by JavaScript */
             background-image: linear-gradient(rgba(0, 255, 255, 0.05) 1px, transparent 1px),
                               linear-gradient(90deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px);
-            background-size: 3px 3px;
+            background-size: cover, 3px 3px, 3px 3px; /* Default for the image, then for gradients */
+            background-position: center center, 0 0, 0 0;
+            background-repeat: no-repeat, repeat, repeat;
+            transition: background-image 1s ease-in-out; /* Smooth transition for background image */
         }
 
-        /* Hovedcontainer for alle elementer (stablingskontekst) */
+        /* Main container for all elements (stacking context) */
         .main-wrapper {
             width: 100%;
-            max-width: 900px; /* Maks bredde for lesbarhet */
+            max-width: 900px; /* Max width for readability */
             display: flex;
             flex-direction: column;
-            gap: 2rem; /* Mellomrom mellom boksene */
+            gap: 2rem; /* Spacing between boxes */
         }
 
-        /* Felles stil for alle de store, rektangulære boksene */
+        /* Common style for all large, rectangular boxes */
         .retro-box {
-            background-color: #000000; /* Svart bakgrunn for boksene */
-            border: 2px solid #00FFFF; /* Neon cyan kant */
-            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5), inset 0 0 5px rgba(0, 255, 255, 0.3); /* Neon glød */
+            background-color: #000000; /* Black background for boxes */
+            border: 2px solid #00FFFF; /* Neon cyan border */
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5), inset 0 0 5px rgba(0, 255, 255, 0.3); /* Neon glow */
             padding: 1.5rem;
             text-align: center;
         }
 
-        /* Topp-boks: Tittel og menyknapper */
+        /* Top box: Title and menu buttons */
         .top-box {
-            composes: retro-box; /* Arver fra retro-box */
+            composes: retro-box; /* Inherits from retro-box */
             padding-top: 2rem;
             padding-bottom: 2rem;
         }
 
         h1 {
-            font-size: 3rem; /* Stor og dominerende tittel */
+            font-size: 3rem; /* Large and dominant title */
             font-weight: bold;
             color: #00FFFF; /* Neon cyan */
-            text-shadow: 0 0 8px rgba(0, 255, 255, 0.8), 0 0 15px rgba(0, 255, 255, 0.6); /* Kraftig neon glød */
+            text-shadow: 0 0 8px rgba(0, 255, 255, 0.8), 0 0 15px rgba(0, 255, 255, 0.6); /* Strong neon glow */
             margin-bottom: 2rem;
-            letter-spacing: 0.1em; /* Mellomrom mellom bokstaver for retro-følelse */
+            letter-spacing: 0.1em; /* Letter spacing for retro feel */
         }
 
         .game-menu-retro {
@@ -65,28 +69,28 @@
             gap: 1.5rem;
         }
 
-        /* Stil for menyknappene */
+        /* Style for menu buttons */
         .retro-button {
             background-color: transparent;
-            border: 2px solid #00FFFF; /* Neon cyan kant */
-            color: #00FFFF; /* Neon cyan tekst */
+            border: 2px solid #00FFFF; /* Neon cyan border */
+            color: #00FFFF; /* Neon cyan text */
             padding: 0.75rem 1.5rem;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             cursor: pointer;
             transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
-            box-shadow: 0 0 5px rgba(0, 255, 255, 0.3); /* Subtil glød */
-            border-radius: 0; /* Skarpe kanter */
+            box-shadow: 0 0 5px rgba(0, 255, 255, 0.3); /* Subtle glow */
+            border-radius: 0; /* Sharp corners */
         }
 
         .retro-button:hover {
-            background-color: #00FFFF; /* Fyll med farge ved hover */
-            color: #000000; /* Svart tekst ved hover */
-            box-shadow: 0 0 10px rgba(0, 255, 255, 0.8), 0 0 20px rgba(0, 255, 255, 0.6); /* Mer intens glød */
+            background-color: #00FFFF; /* Fill with color on hover */
+            color: #000000; /* Black text on hover */
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.8), 0 0 20px rgba(0, 255, 255, 0.6); /* More intense glow */
         }
         .retro-button:active {
-            background-color: #00BBBB; /* Litt mørkere cyan ved klikk */
+            background-color: #00BBBB; /* Slightly darker cyan on click */
             box-shadow: 0 0 5px rgba(0, 255, 255, 0.8);
         }
         .retro-button:disabled {
@@ -103,11 +107,10 @@
             box-shadow: none;
         }
 
-
-        /* Midtre boks: Spillområde */
+        /* Middle box: Game area */
         .game-area-retro {
-            composes: retro-box; /* Arver fra retro-box */
-            min-height: 350px; /* Minimum høyde */
+            composes: retro-box; /* Inherits from retro-box */
+            min-height: 350px; /* Minimum height */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -120,13 +123,13 @@
             letter-spacing: 0.03em;
         }
 
-        /* Spillspesifikke stiler inni spillområdet (justert til neon-tema) */
+        /* Game-specific styles inside the game area (adjusted to neon theme) */
         #guessTheNumberGame, #questionGame, #snakeGame, #pongGame {
-            background-color: #000000; /* Svart bakgrunn for spilldivs */
-            border: none; /* Fjern intern ramme om nødvendig */
-            box-shadow: none; /* Fjern intern skygge om nødvendig */
-            padding: 0; /* Fjern padding om nødvendig for renere look */
-            width: 100%; /* Sørg for at den fyller game-area-retro */
+            background-color: #000000; /* Black background for game divs */
+            border: none; /* Remove internal border if necessary */
+            box-shadow: none; /* Remove internal shadow if necessary */
+            padding: 0; /* Remove padding if necessary for cleaner look */
+            width: 100%; /* Ensure it fills game-area-retro */
             max-width: none;
         }
 
@@ -159,12 +162,12 @@
             box-shadow: 0 0 8px rgba(0, 255, 255, 0.8), inset 0 0 3px rgba(0, 255, 255, 0.5);
         }
 
-        /* Knapper inne i spill- og chat-områdene */
+        /* Buttons inside game and chat areas */
         #guessTheNumberGame button,
         #questionGame button,
         #snakeGameControls button,
         #pongGameControls button,
-        #userChatContainer button:not(#userChatSendButton), /* Spesifikk for "Tøm Chat", "Logg ut" */
+        #userChatContainer button:not(#userChatSendButton), /* Specific for "Clear Chat", "Logout" */
         #loginForm button, #registerForm button { /* Added login/register buttons */
             background-color: transparent;
             border: 2px solid #00FFFF;
@@ -176,7 +179,7 @@
             box-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
             border-radius: 0;
             transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
-            margin-top: 1rem; /* Mer avstånd fra input */
+            margin-top: 1rem; /* More spacing from input */
         }
 
         #guessTheNumberGame button:hover,
@@ -199,23 +202,23 @@
             box-shadow: 0 0 5px rgba(0, 255, 255, 0.8);
         }
 
-        /* Snake og Pong Canvas */
+        /* Snake and Pong Canvas */
         #snakeCanvas, #pongCanvas {
-            background-color: #0A0A0A; /* Nesten svart for spillområdet */
+            background-color: #0A0A0A; /* Almost black for game area */
             border: 2px solid #00FFFF;
             box-shadow: 0 0 15px rgba(0, 255, 255, 0.6), inset 0 0 5px rgba(0, 255, 255, 0.3);
             border-radius: 0;
             width: 100%; /* For responsive canvas */
             height: auto; /* Maintain aspect ratio */
-            max-width: 400px; /* Maks bredde som i forrige versjon */
-            aspect-ratio: 1 / 1; /* Behold kvadratisk for snake */
+            max-width: 400px; /* Max width as in previous version */
+            aspect-ratio: 1 / 1; /* Keep square for snake */
         }
         #pongCanvas {
-            max-width: 500px; /* Maks bredde for pong */
+            max-width: 500px; /* Max width for pong */
             aspect-ratio: 5 / 3; /* Pong aspect ratio */
         }
         
-        /* Justering av elementer i Snake/Pong for å passe temaet */
+        /* Adjustments for Snake/Pong elements to fit theme */
         /* Snake */
         #snakeCanvas + #snakeGameControls button { margin-top: 1.5rem; }
         #snakeScore { color: #00FFFF; text-shadow: 0 0 5px rgba(0, 255, 255, 0.5); }
@@ -226,19 +229,18 @@
         #pongMessage { color: #FFFF00; text-shadow: 0 0 5px rgba(255, 255, 0, 0.5); }
         .pong-controls-info { color: #00FFFF; font-size: 0.85rem; }
 
-
-        /* Bunn-boks: Bruker Chat */
+        /* Bottom box: User Chat */
         .bottom-box {
-            composes: retro-box; /* Arver fra retro-box */
+            composes: retro-box; /* Inherits from retro-box */
         }
 
         #userChatOutput {
-            background-color: #0A0A0A; /* Mørkere bakgrunn for chat-output */
+            background-color: #0A0A0A; /* Darker background for chat output */
             border: 1px solid #00FFFF;
             color: #00FFFF;
             padding: 1rem;
-            min-height: 150px; /* Mindre chat-vindu som i bildet */
-            max-height: 250px; /* Liten, men scrollbar hvis mer innhold */
+            min-height: 150px; /* Smaller chat window as in image */
+            max-height: 250px; /* Small, but scrollable if more content */
             overflow-y: auto;
             text-align: left;
             display: flex;
@@ -251,19 +253,19 @@
 
         .chat-message {
             padding: 0.3rem 0.6rem;
-            border-radius: 0; /* Skarpe kanter */
-            max-width: 95%; /* Mindre marger */
-            word-break: break-word; /* Sikrer at lange ord brytes */
+            border-radius: 0; /* Sharp corners */
+            max-width: 95%; /* Smaller margins */
+            word-break: break-word; /* Ensures long words break */
         }
 
         .user-chat-message {
-            background-color: rgba(0, 150, 255, 0.2); /* Semi-transparent blå */
-            border-left: 3px solid #00FFFF; /* Marker venstre side */
+            background-color: rgba(0, 150, 255, 0.2); /* Semi-transparent blue */
+            border-left: 3px solid #00FFFF; /* Mark left side */
             align-self: flex-start;
         }
         .current-user-chat-message {
-            background-color: rgba(0, 255, 0, 0.1); /* Semi-transparent grønn for egen melding */
-            border-right: 3px solid #00FFFF; /* Marker høyre side */
+            background-color: rgba(0, 255, 0, 0.1); /* Semi-transparent green for own message */
+            border-right: 3px solid #00FFFF; /* Mark right side */
             align-self: flex-end;
             text-align: right;
         }
@@ -272,7 +274,7 @@
             text-shadow: 0 0 3px rgba(0, 255, 255, 0.5);
         }
         .chat-message span.text-xs {
-            color: #9CA3AF; /* Gråere for tid */
+            color: #9CA3AF; /* Grayer for time */
         }
 
         #userChatInputContainer {
@@ -293,7 +295,7 @@
             transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
             box-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
             border-radius: 0;
-            flex-shrink: 0; /* Hindrer krymping */
+            flex-shrink: 0; /* Prevent shrinking */
         }
         #userChatSendButton:hover {
             background-color: #00FFFF;
@@ -313,7 +315,7 @@
         }
 
         #currentUserIdDisplay { /* Changed ID to avoid conflict with currentUserId variable */
-            color: #FFFF00; /* Gul for ID for å skille den ut */
+            color: #FFFF00; /* Yellow for ID to distinguish it */
             text-shadow: 0 0 5px rgba(255, 255, 0, 0.5);
         }
         #currentNicknameDisplay { /* New element for nickname */
@@ -322,8 +324,7 @@
             margin-left: 0.5rem;
         }
 
-
-        /* Skjul AI Chat i denne layouten for å matche bildet */
+        /* Hide AI Chat in this layout to match the image */
         #aiChatContainer {
             display: none !important;
         }
@@ -332,7 +333,7 @@
             text-align: center;
             margin-top: 2rem;
             font-size: 0.875rem;
-            color: #9CA3AF; /* Gråere tekst for mindre viktig info */
+            color: #9CA3AF; /* Grayer text for less important info */
         }
 
         /* Responsive */
@@ -456,6 +457,29 @@
                 padding: 0.8rem 2rem;
             }
         }
+
+        /* Loading indicator for background image */
+        .loading-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 1.125rem;
+            color: #00FFFF; /* Neon cyan */
+            margin-top: 1rem;
+        }
+        .loading-spinner {
+            border: 4px solid rgba(0, 255, 255, 0.3); /* Lighter cyan border */
+            border-top: 4px solid #00FFFF; /* Neon cyan top border */
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -473,7 +497,11 @@
                     Gjør deg klar for nostalgi og spenning!
                 </span>
             </p>
-            <button class="retro-button mt-6" onclick="showAuthModal('login')">START SPILL</button>
+            <div id="backgroundLoading" class="loading-indicator hidden">
+                <div class="loading-spinner"></div>
+                <span>Laster arkadebakgrunn...</span>
+            </div>
+            <button class="retro-button mt-6" onclick="showAuthModal('login')" id="startGameButton" disabled>START SPILL</button>
         </div>
 
         <div class="top-box">
@@ -488,15 +516,15 @@
         </div>
 
         <main class="game-area-retro" id="gameArea">
-            <!-- Spillinnholdet vil lastes inn her via JavaScript -->
+            <!-- Game content will be loaded here via JavaScript -->
             <p>Velg et spill for å starte!</p>
         </main>
 
-        <!-- Bruker Chat er nå den faste bunn-boksen -->
+        <!-- User Chat is now the fixed bottom box -->
         <div id="userChatContainer" class="bottom-box">
             <h2 class="text-2xl font-bold text-center mb-4" style="color: #00FFFF; text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);">BRUKER CHAT</h2>
             <div id="userChatOutput" class="flex-grow overflow-y-auto mb-4">
-                <!-- Bruker chat messages will appear here -->
+                <!-- User chat messages will appear here -->
             </div>
             <p id="userChatLoadingIndicator" class="text-center italic text-gray-400 hidden">SENDER MELDING...</p>
             <div id="userChatInputContainer" class="flex gap-2">
@@ -509,7 +537,6 @@
                 <button onclick="logoutUser()" class="retro-button px-3 py-1 text-sm ml-2">LOGG UT</button>
             </div>
         </div>
-
 
         <footer>
             <p>&copy; 2025 MINISPILL ARCADE</p>
@@ -540,8 +567,7 @@
         </div>
     </div>
 
-
-    <!-- Firebase SDK - IKKE ENDRE URL -->
+    <!-- Firebase SDK - DO NOT CHANGE URL -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { 
@@ -570,16 +596,16 @@
             getDocs 
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Globala variabler (definieras av Canvas-miljön)
+        // Global variables (defined by Canvas environment)
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-        // Firebase-initiering
+        // Firebase initialization
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
-        let currentUserId = 'anonymous'; // Standardverdi
+        let currentUserId = 'anonymous'; // Default value
         let currentNickname = 'LASTER...'; // New: Store current user's nickname
         let unsubscribeUserChat = null; // To manage the chat listener subscription
 
@@ -805,7 +831,7 @@
         }
 
 
-        // --- Referanse til spillområdet ---
+        // --- Reference to game area ---
         // These are now initialized based on the auth state, not hidden by default here
         const gameArea = document.getElementById('gameArea');
         const userChatContainer = document.getElementById('userChatContainer');
@@ -817,13 +843,13 @@
         // Flag to prevent adding multiple event listeners for Pong controls
         let pongEventListenersAdded = false;
 
-        // Funksjon for å laste et spill inn i spillområdet
+        // Function to load a game into the game area
         function loadGame(gameName) {
-            gameArea.innerHTML = ''; // Tømmer spillområdet
-            // Stopp alle aktive spill-looper før et nytt spill lastes
+            gameArea.innerHTML = ''; // Clear game area
+            // Stop all active game loops before loading a new game
             stopAllGameLoops();
 
-            // Sørg for at spillområdet alltid er synlig i denne layouten
+            // Ensure game area is always visible in this layout
             gameArea.classList.remove('hidden');
 
             switch (gameName) {
@@ -833,7 +859,7 @@
                 case 'questionGame': 
                     loadQuestionGame();
                     break;
-                case 'retroGames': // Denne knappen er nå fjernet fra main menu
+                case 'retroGames': // This button is now removed from main menu
                     loadRetroGamesMenu();
                     break;
                 case 'snakeGame':
@@ -842,13 +868,13 @@
                 case 'pongGame':
                     loadPongGame();
                     break;
-                // AI Chat og Bruker Chat er nå faste elementer, ikke lastet inn i gameArea
+                // AI Chat and User Chat are now fixed elements, not loaded into gameArea
                 default:
                     gameArea.innerHTML = '<p>Velg et spill for å starte!</p>';
             }
         }
 
-        // Funksjon for å stoppe alle aktive spill-looper
+        // Function to stop all active game loops
         function stopAllGameLoops() {
             // Snake game loop
             if (snakeGameLoopId) {
@@ -860,7 +886,7 @@
                 cancelAnimationFrame(pongAnimationFrameId);
                 pongAnimationFrameId = null;
             }
-            // Fjern event listeners for spillkontroller
+            // Remove event listeners for game controls
             document.removeEventListener('keydown', changeDirection); // For Snake
             // Only remove Pong listeners if they were actually added
             if (pongEventListenersAdded) {
@@ -870,8 +896,7 @@
             }
         }
 
-
-        // --- Gjett Tallet-spillet ---
+        // --- Guess The Number Game ---
         function loadGuessTheNumberGame() {
             gameArea.innerHTML = `
                 <div id="guessTheNumberGame" class="w-full max-w-md p-4 flex flex-col items-center">
@@ -909,7 +934,7 @@
 
             if (isNaN(guess) || guess < 1 || guess > 100) {
                 gameMessage.textContent = "VENNLIGST SKRIV INN ET GYLDIG TALL MELLOM 1 OG 100.";
-                gameMessage.style.color = '#FF00FF'; /* Magenta for feil */
+                gameMessage.style.color = '#FF00FF'; /* Magenta for error */
                 return;
             }
 
@@ -918,14 +943,14 @@
 
             if (guess === secretNumber) {
                 gameMessage.textContent = `GRATULERER! DU GJETTET RIKTIG TALL (${secretNumber}) PÅ ${attempts} FORSØK!`;
-                gameMessage.style.color = '#00FF00'; /* Grønn for riktig */
+                gameMessage.style.color = '#00FF00'; /* Green for correct */
                 guessInput.disabled = true;
             } else if (guess < secretNumber) {
                 gameMessage.textContent = "FOR LAVT! PRØV ET HØYERE TALL.";
-                gameMessage.style.color = '#FFFF00'; /* Gul for hint */
+                gameMessage.style.color = '#FFFF00'; /* Yellow for hint */
             } else {
                 gameMessage.textContent = "FOR HØYT! PRØV ET LAVERE TALL.";
-                gameMessage.style.color = '#FFFF00'; /* Gul for hint */
+                gameMessage.style.color = '#FFFF00'; /* Yellow for hint */
             }
 
             guessInput.value = '';
@@ -942,7 +967,7 @@
             console.log("Secret number (for testing):", secretNumber);
         }
 
-        // --- Spørsmålsspillet (Ikke lenger i meny, men beholdt funksjonalitet) ---
+        // --- Question Game (Not in main menu anymore, but functionality kept) ---
         let questions = [];
         let currentQuestionIndex;
         let correctAnswers = 0;
@@ -1077,7 +1102,7 @@
 
             if (userAnswer === correctAnswer) {
                 answerMessage.textContent = "RIKTIG SVAR! 🎉";
-                answerMessage.style.color = '#00FF00'; /* Grønn */
+                answerMessage.style.color = '#00FF00'; /* Green */
                 correctAnswers++;
             } else {
                 answerMessage.textContent = `FEIL SVAR. SVARET VAR: ${questions[currentQuestionIndex].answer.toUpperCase()}`;
@@ -1094,7 +1119,7 @@
             if (currentQuestionIndex >= 0 && !answerInput.disabled && currentQuestionIndex < questions.length) {
                  totalQuestionsAsked++;
                  answerMessage.textContent = `DU HOPPET OVER DETTE. SVARET VAR: ${questions[currentQuestionIndex].answer.toUpperCase()}`;
-                 answerMessage.style.color = '#FFFF00'; /* Gul */
+                 answerMessage.style.color = '#FFFF00'; /* Yellow */
                  updateQuestionScore();
             }
 
@@ -1116,7 +1141,7 @@
             }
         }
 
-        // --- Resultatliste (Leaderboard) funksjoner ---
+        // --- Leaderboard functions ---
         function getLeaderboard() {
             const leaderboardJson = localStorage.getItem(LEADERBOARD_KEY);
             return leaderboardJson ? JSON.parse(leaderboardJson) : [];
@@ -1205,7 +1230,7 @@
             answerMessage.style.color = '#00FF00';
         }
 
-        // --- Retro Games Menu (Ikke lenger i meny, men beholdt funksjonalitet) ---
+        // --- Retro Games Menu (Not in main menu anymore, but functionality kept) ---
         function loadRetroGamesMenu() {
             gameArea.innerHTML = `
                 <div class="w-full max-w-2xl p-4">
@@ -1240,7 +1265,6 @@
                 </div>
             `;
         }
-
 
         // --- Snake Game ---
         let snakeCanvas, snakeCtx;
@@ -1287,14 +1311,14 @@
         }
 
         function drawSnakePart(snakePart) {
-            snakeCtx.fillStyle = '#00FF00'; /* Neon grønn for slange */
-            snakeCtx.strokeStyle = '#00BB00'; /* Mørkere grønn */
+            snakeCtx.fillStyle = '#00FF00'; /* Neon green for snake */
+            snakeCtx.strokeStyle = '#00BB00'; /* Darker green */
             snakeCtx.fillRect(snakePart.x * GRID_SIZE, snakePart.y * GRID_SIZE, GRID_SIZE, GRID_SIZE);
             snakeCtx.strokeRect(snakePart.x * GRID_SIZE, snakePart.y * GRID_SIZE, GRID_SIZE, GRID_SIZE);
         }
 
         function drawFood() {
-            snakeCtx.fillStyle = '#FF00FF'; /* Neon magenta for mat */
+            snakeCtx.fillStyle = '#FF00FF'; /* Neon magenta for food */
             snakeCtx.strokeStyle = '#BB00BB';
             snakeCtx.fillRect(food.x * GRID_SIZE, food.y * GRID_SIZE, GRID_SIZE, GRID_SIZE);
             snakeCtx.strokeRect(food.x * GRID_SIZE, food.y * GRID_SIZE, GRID_SIZE, GRID_SIZE);
@@ -1469,7 +1493,7 @@
             // Initialize paddle and ball positions and properties
             paddle1 = { x: 10, y: pongCanvas.height / 2 - 30, width: 10, height: 60, dy: 0, color: '#00FFFF' }; /* Neon cyan */
             paddle2 = { x: pongCanvas.width - 20, y: pongCanvas.height / 2 - 30, width: 10, height: 60, dy: 0, color: '#FF00FF' }; /* Neon magenta */
-            ball = { x: pongCanvas.width / 2, y: pongCanvas.height / 2, radius: 7, dx: 0, dy: 0, color: '#FFFF00' }; /* Neon gul */
+            ball = { x: pongCanvas.width / 2, y: pongCanvas.height / 2, radius: 7, dx: 0, dy: 0, color: '#FFFF00' }; /* Neon yellow */
         }
 
         function resetPongGame() {
@@ -1501,7 +1525,7 @@
             pongCtx.fillRect(0, 0, pongCanvas.width, pongCanvas.height);
 
             // Draw middle line
-            pongCtx.strokeStyle = '#00FFFF'; /* Neon cyan midtlinje */
+            pongCtx.strokeStyle = '#00FFFF'; /* Neon cyan middle line */
             pongCtx.beginPath();
             pongCtx.setLineDash([5, 5]); // Dashed line
             pongCtx.moveTo(pongCanvas.width / 2, 0);
@@ -1668,7 +1692,7 @@
         async function sendMessage() { /* No-op in this UI */ return Promise.resolve(); } // Return a promise
         async function googleSearch(queries) { /* No-op in this UI */ return []; }
 
-        // --- Bruker Chat (Firestore) ---
+        // --- User Chat (Firestore) ---
         let nicknameCache = {}; // Cache for nicknames to reduce Firestore reads
 
         async function getNickname(userId) {
@@ -1715,7 +1739,7 @@
                 // Fallback display if nickname fetching fails
                 messageDiv.className = `chat-message ${messageClass}`;
                 messageDiv.innerHTML = `<span class="font-bold text-xs">FEIL BRUKER</span> <span class="text-xs text-gray-200">${date}</span><br>${message.toUpperCase()}`;
-                userChatOutput.appendChild(messageDiv);
+                userChatOutput.appendChild(msgDiv);
                 userChatOutput.scrollTop = userChatOutput.scrollHeight;
             });
         }
@@ -1837,7 +1861,7 @@
                     document.body.removeChild(confirmClear);
                     const userChatOutput = document.getElementById('userChatOutput');
                     if (userChatOutput) {
-                        userChatOutput.innerHTML = '<div class="chat-message user-chat-message" style="color: #FFFF00;">TØMMER CHAT...</div>'; // Feedback til bruker
+                        userChatOutput.innerHTML = '<div class="chat-message user-chat-message" style="color: #FFFF00;">TØMMER CHAT...</div>'; // Feedback to user
                     }
                     try {
                         // Check if user is authenticated before allowing delete
@@ -1856,7 +1880,7 @@
                             deletePromises.push(window.deleteDoc(window.doc(window.db, `artifacts/${window.__app_id}/public/data/user_chats`, doc.id)));
                         });
                         await Promise.all(deletePromises);
-                        console.log("Chat historikk tømt.");
+                        console.log("Chat history cleared.");
                         resolve(true); // Indicate success
                     } catch (error) {
                         console.error("Feil ved tømming av chat-historikk:", error);
@@ -1873,16 +1897,69 @@
             });
         }
 
+        // --- Function to generate and apply background image ---
+        async function generateAndApplyBackground() {
+            const prompt = "Arcadehall 1980's aged image children running to play, others being social and happy vintage cars outside and adults enjoying life feeling safe knowing theres nothing to fear, retro, neon, dark, atmospheric";
+            const backgroundLoading = document.getElementById('backgroundLoading');
+            const startGameButton = document.getElementById('startGameButton');
+            const bodyElement = document.body;
 
-        // Laster "Gjett Tallet"-spillet automatisk når siden lastes som standard
+            backgroundLoading.classList.remove('hidden');
+            startGameButton.disabled = true; // Disable button while loading
+
+            const payload = { instances: { prompt: prompt }, parameters: { "sampleCount": 1} };
+            const apiKey = ""; // Canvas will provide this at runtime
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API call failed with status: ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                if (result.predictions && result.predictions.length > 0 && result.predictions[0].bytesBase64Encoded) {
+                    const imageUrl = `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
+                    // Apply the image as background-image, layering it behind the existing gradient
+                    bodyElement.style.backgroundImage = `url('${imageUrl}'), linear-gradient(rgba(0, 255, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px)`;
+                    bodyElement.style.backgroundSize = `cover, 3px 3px, 3px 3px`;
+                    bodyElement.style.backgroundPosition = `center center, 0 0, 0 0`;
+                    bodyElement.style.backgroundRepeat = `no-repeat, repeat, repeat`;
+                    // Make sure the body has enough height to show the background
+                    bodyElement.style.minHeight = '100vh';
+
+                    console.log("Bakgrunnsbilde generert og anvendt.");
+                } else {
+                    console.error("Feil: Ingen bildedata mottatt for bakgrunn. Bruker standard bakgrunn.");
+                }
+            } catch (error) {
+                console.error('Feil ved generering av bakgrunnsbilde:', error);
+                // Fallback to existing solid black background with neon lines
+            } finally {
+                backgroundLoading.classList.add('hidden');
+                startGameButton.disabled = false; // Enable button after loading (or error)
+            }
+        }
+
+
+        // Load "Guess The Number" game automatically when the page loads as default
         window.onload = () => {
-            // Initialiserer spillområdet, auth modal, og landing page for å kontrollere visning
+            // Initialize game area, auth modal, and landing page to control visibility
             document.getElementById('landingPage').classList.remove('hidden'); // Show landing page initially
             document.getElementById('authModal').classList.add('hidden'); // Hide auth modal
             gameArea.classList.add('hidden'); // Hide game area
             topBox.classList.add('hidden'); // Hide top box
             userChatContainer.classList.add('hidden'); // Hide chat container
             footer.classList.add('hidden'); // Hide footer
+
+            // Call the function to generate and apply background
+            generateAndApplyBackground();
         };
 
     </script>
