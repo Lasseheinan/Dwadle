@@ -307,6 +307,101 @@
             color: #34d399;
         }
 
+        /* AI Chat spesifikke stiler */
+        #aiChat {
+            background-color: #2d3748; /* Mørkere grå for chat-bakgrunn */
+            padding: 1.5rem;
+            border-radius: 1rem;
+            width: 100%;
+            max-width: 600px; /* Maks bredde for chat */
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        #chatOutput {
+            background-color: #1a202c; /* Enda mørkere for chat-historikk */
+            border-radius: 0.75rem;
+            padding: 1rem;
+            min-height: 250px;
+            max-height: 400px;
+            overflow-y: auto;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            color: #e2e8f0;
+            line-height: 1.5;
+        }
+
+        .chat-message {
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            max-width: 85%;
+        }
+
+        .user-message {
+            background-color: #6366f1; /* Indigo for brukerens meldinger */
+            align-self: flex-end;
+            color: white;
+        }
+
+        .ai-message {
+            background-color: #4a5568; /* Mellomgrå for AI-meldinger */
+            align-self: flex-start;
+            color: #e2e8f0;
+        }
+
+        #chatInputContainer {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        #chatInput {
+            flex-grow: 1;
+            background-color: #6b7280;
+            color: #f3f4f6;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            border: 1px solid #4b5563;
+            font-size: 1rem;
+        }
+        #chatInput:focus {
+            outline: none;
+            ring: 2px solid #8b5cf6;
+        }
+
+        #chatSendButton {
+            background-image: linear-gradient(to right, #059669, #10b981); /* Grønn gradient */
+            color: white;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            font-weight: 600;
+            transition: all 0.2s ease-in-out;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            white-space: nowrap; /* Forhindrer wrapping */
+        }
+        #chatSendButton:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        #chatSendButton:disabled {
+            background-image: linear-gradient(to right, #4a5568, #667eea);
+            cursor: not-allowed;
+            opacity: 0.7;
+            transform: none;
+            box-shadow: none;
+        }
+
+        #loadingIndicator {
+            color: #a78bfa;
+            font-style: italic;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+
 
         footer {
             text-align: center;
@@ -341,6 +436,18 @@
                 width: 100%;
                 height: auto; /* Justeres basert på aspect ratio */
             }
+            #aiChat {
+                padding: 1rem;
+            }
+            .chat-message {
+                max-width: 100%;
+            }
+            #chatInputContainer {
+                flex-direction: column;
+            }
+            #chatSendButton {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -355,6 +462,7 @@
             <button class="game-button" onclick="loadGame('guessTheNumber')">Gjett Tallet</button>
             <button class="game-button" onclick="loadGame('questionGame')">Spørsmålsspill</button>
             <button class="game-button" onclick="loadGame('retroGames')">Retro Spill</button>
+            <button class="game-button" onclick="loadGame('aiChat')">AI Chat</button>
             <button class="game-button" onclick="loadGame('anotherGame')" disabled>Et Annet Spill (kommer)</button>
             <!-- Legg til flere spillknapper her -->
         </nav>
@@ -392,6 +500,9 @@
                 case 'snakeGame': // Spesifikt for Snake, lastes fra retroGames menu
                     loadSnakeGame();
                     break;
+                case 'aiChat':
+                    loadAIChat();
+                    break;
                 case 'anotherGame':
                     gameArea.innerHTML = '<h2 class="text-2xl text-yellow-400">Dette spillet kommer snart!</h2><p class="mt-2 text-gray-300">Følg med for mer moro.</p>';
                     break;
@@ -407,7 +518,7 @@
                 clearTimeout(snakeGameLoopId);
                 snakeGameLoopId = null;
             }
-            // Add other game loops here if they use requestAnimationFrame or setInterval/setTimeout
+            // Legg til andre spill-looper her hvis de bruker requestAnimationFrame eller setInterval/setTimeout
         }
 
 
@@ -948,6 +1059,91 @@
             alert("Game Over! Ditt poeng: " + score); // Simple alert for now
             resetSnakeGame();
         }
+
+        // --- AI Chat ---
+        let chatHistory = []; // Stores the chat history for AI model context
+
+        function loadAIChat() {
+            gameArea.innerHTML = `
+                <div id="aiChat" class="w-full max-w-xl bg-gray-700 p-6 rounded-xl shadow-lg flex flex-col">
+                    <h2 class="text-2xl font-bold text-purple-400 mb-4 text-center">AI Chat</h2>
+                    <div id="chatOutput" class="flex-grow overflow-y-auto mb-4">
+                        <!-- Chat messages will appear here -->
+                    </div>
+                    <p id="loadingIndicator" class="text-center italic text-purple-300 hidden">AI tenker...</p>
+                    <div id="chatInputContainer" class="flex gap-2">
+                        <input type="text" id="chatInput" placeholder="Skriv din melding her..." class="flex-grow">
+                        <button id="chatSendButton" onclick="sendMessage()">Send</button>
+                    </div>
+                </div>
+            `;
+            // Add event listener for Enter key
+            document.getElementById('chatInput').addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            // Ensure chat history is loaded (or initialized if first time)
+            chatHistory = []; // Clear chat history on load of new chat session
+            displayAIChatMessage("Hei! Jeg er din AI-assistent. Hva kan jeg hjelpe deg med i dag?", 'ai-message');
+        }
+
+        function displayAIChatMessage(message, type) {
+            const chatOutput = document.getElementById('chatOutput');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${type}`;
+            messageDiv.textContent = message;
+            chatOutput.appendChild(messageDiv);
+            chatOutput.scrollTop = chatOutput.scrollHeight; // Scroll to bottom
+        }
+
+        async function sendMessage() {
+            const chatInput = document.getElementById('chatInput');
+            const chatSendButton = document.getElementById('chatSendButton');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const userMessage = chatInput.value.trim();
+
+            if (userMessage === '') return;
+
+            displayAIChatMessage(userMessage, 'user-message');
+            chatHistory.push({ role: "user", parts: [{ text: userMessage }] });
+
+            chatInput.value = '';
+            chatSendButton.disabled = true; // Deaktiver send-knapp mens AI tenker
+            loadingIndicator.classList.remove('hidden'); // Vis lasteindikator
+
+            try {
+                const payload = { contents: chatHistory };
+                const apiKey = ""; // API-nøkkelen er tom da Canvas håndterer dette
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const aiResponse = result.candidates[0].content.parts[0].text;
+                    displayAIChatMessage(aiResponse, 'ai-message');
+                    chatHistory.push({ role: "model", parts: [{ text: aiResponse }] }); // Legg til AI-svar i historikken
+                } else {
+                    displayAIChatMessage("Beklager, jeg fikk ikke et svar. Prøv igjen.", 'ai-message');
+                    console.error("Uventet AI-responsstruktur:", result);
+                }
+            } catch (error) {
+                console.error("Feil ved henting av AI-svar:", error);
+                displayAIChatMessage("En feil oppstod. Klarte ikke å hente svar fra AI.", 'ai-message');
+            } finally {
+                chatSendButton.disabled = false; // Aktiver send-knapp igjen
+                loadingIndicator.classList.add('hidden'); // Skjul lasteindikator
+                chatInput.focus(); // Sett fokus tilbake til inputfeltet
+            }
+        }
+
 
         // Laster "Gjett Tallet"-spillet automatisk når siden lastes som standard
         window.onload = () => loadGame('guessTheNumber');
