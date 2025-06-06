@@ -26,13 +26,19 @@
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1); /* skygge */
             padding: 2.5rem;
             width: 100%;
-            max-width: 900px; /* Maks bredde for lesbarhet */
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
+            max-width: 1200px; /* Økt maks bredde for å få plass til chat side ved side */
+            display: grid; /* Bruk grid for layout */
+            grid-template-areas:
+                "header header"
+                "menu menu"
+                "game chat"
+                "footer footer"; /* Standard layout for store skjermer */
+            grid-template-columns: 1fr 350px; /* Spillområde og chat-kolonne */
+            gap: 2rem; /* Gap mellom elementer */
         }
 
         header {
+            grid-area: header;
             text-align: center;
             margin-bottom: 1rem;
         }
@@ -45,6 +51,7 @@
         }
 
         .game-menu {
+            grid-area: menu;
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
@@ -73,6 +80,7 @@
         }
 
         .game-area {
+            grid-area: game;
             background-color: #4b5563; /* Lysere grå for spillområdet */
             border-radius: 1rem;
             padding: 2rem;
@@ -355,15 +363,20 @@
 
 
         /* AI Chat spesifikke stiler */
-        #aiChat {
+        #aiChatContainer { /* Ny container for å styre vis/skjul og layout */
+            grid-area: chat;
             background-color: #2d3748; /* Mørkere grå for chat-bakgrunn */
             padding: 1.5rem;
             border-radius: 1rem;
             width: 100%;
-            max-width: 600px; /* Maks bredde for chat */
             display: flex;
             flex-direction: column;
             gap: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        #aiChatContainer.hidden {
+            display: none;
         }
 
         #chatOutput {
@@ -451,6 +464,7 @@
 
 
         footer {
+            grid-area: footer;
             text-align: center;
             margin-top: 2rem;
             font-size: 0.875rem;
@@ -458,8 +472,15 @@
         }
 
         /* Responsivitet for små skjermer */
-        @media (max-width: 640px) {
+        @media (max-width: 1024px) { /* Endret breakpoint for layout */
             .container {
+                grid-template-areas:
+                    "header"
+                    "menu"
+                    "game"
+                    "chat"
+                    "footer";
+                grid-template-columns: 1fr; /* Enkel kolonne på mindre skjermer */
                 padding: 1.5rem;
                 gap: 1.5rem;
             }
@@ -483,7 +504,7 @@
                 width: 100%;
                 height: auto; /* Justeres basert på aspect ratio */
             }
-            #aiChat {
+            #aiChatContainer { /* Bruk den nye container-ID-en */
                 padding: 1rem;
             }
             .chat-message {
@@ -519,6 +540,21 @@
             <p class="text-xl text-gray-400">Velg et spill fra menyen over for å begynne!</p>
         </main>
 
+        <!-- AI Chat er flyttet ut av gameArea for å være persistent -->
+        <div id="aiChatContainer" class="hidden">
+            <h2 class="text-2xl font-bold text-purple-400 mb-4 text-center">AI Chat</h2>
+            <div id="chatOutput" class="flex-grow overflow-y-auto mb-4">
+                <!-- Chat messages will appear here -->
+            </div>
+            <p id="loadingIndicator" class="text-center italic text-purple-300 hidden">AI tenker...</p>
+            <div id="chatInputContainer" class="flex gap-2">
+                <input type="text" id="chatInput" placeholder="Skriv din melding her..." class="flex-grow">
+                <button id="chatSendButton" onclick="sendMessage()">Send</button>
+            </div>
+            <button onclick="resetAIChat()" class="mt-4 bg-red-600 hover:bg-red-700 w-full rounded-md py-2 px-4 text-white font-semibold">Start Ny Samtale</button>
+        </div>
+
+
         <footer>
             <p>&copy; 2025 Minispill. Alle rettigheter reservert.</p>
         </footer>
@@ -527,6 +563,7 @@
     <script>
         // Referanse til spillområdet
         const gameArea = document.getElementById('gameArea');
+        const aiChatContainer = document.getElementById('aiChatContainer'); // Referanse til den nye chat-containeren
 
         // requestAnimationFrame ID for Pong, so it can be cancelled
         let pongAnimationFrameId = null;
@@ -536,6 +573,7 @@
             gameArea.innerHTML = ''; // Tømmer spillområdet
             // Stopp alle aktive spill-looper før et nytt spill lastes
             stopAllGameLoops();
+            hideAIChatPanel(); // Skjul AI Chat når et nytt spill lastes
 
             switch (gameName) {
                 case 'guessTheNumber':
@@ -552,6 +590,9 @@
                     break;
                 case 'pongGame': // Spesifikt for Pong, lastes fra retroGames menu
                     loadPongGame();
+                    break;
+                case 'aiChat':
+                    showAIChatPanel(); // Vis AI Chat når den velges
                     break;
                 case 'anotherGame':
                     gameArea.innerHTML = '<h2 class="text-2xl text-yellow-400">Dette spillet kommer snart!</h2><p class="mt-2 text-gray-300">Følg med for mer moro.</p>';
@@ -1401,49 +1442,36 @@
             }
         ];
 
-        function loadAIChat() {
-            gameArea.innerHTML = `
-                <div id="aiChat" class="w-full max-w-xl bg-gray-700 p-6 rounded-xl shadow-lg flex flex-col">
-                    <h2 class="text-2xl font-bold text-purple-400 mb-4 text-center">AI Chat</h2>
-                    <div id="chatOutput" class="flex-grow overflow-y-auto mb-4">
-                        <!-- Chat messages will appear here -->
-                    </div>
-                    <p id="loadingIndicator" class="text-center italic text-purple-300 hidden">AI tenker...</p>
-                    <div id="chatInputContainer" class="flex gap-2">
-                        <input type="text" id="chatInput" placeholder="Skriv din melding her..." class="flex-grow">
-                        <button id="chatSendButton" onclick="sendMessage()">Send</button>
-                    </div>
-                    <button onclick="resetAIChat()" class="mt-4 bg-red-600 hover:bg-red-700 w-full rounded-md py-2 px-4 text-white font-semibold">Start Ny Samtale</button>
-                </div>
-            `;
-            // Add event listener for Enter key
-            document.getElementById('chatInput').addEventListener('keypress', function(event) {
-                if (event.key === 'Enter') {
-                    sendMessage();
-                }
-            });
+        function showAIChatPanel() {
+            aiChatContainer.classList.remove('hidden'); // Vis chat-containeren
+            loadAIChatHistory(); // Last chat-historikk ved visning
+            const chatOutput = document.getElementById('chatOutput');
+            const chatInput = document.getElementById('chatInput');
 
-            loadAIChatHistory(); // Load chat history from localStorage
+            chatOutput.innerHTML = ''; // Tøm display, fyll fra historikk
             if (chatHistory.length === 0) {
                 // Initial system instruction/persona for the AI
                 chatHistory.push({ role: "user", parts: [{ text: "Du er en vennlig og hjelpsom AI-assistent for en minispillside. Du skal gi korte, relevante svar på spørsmål og oppmuntre brukeren til å spille spillene på siden." }] });
                 displayAIChatMessage("Hei! Jeg er din AI-assistent. Hva kan jeg hjelpe deg med i dag?", 'ai-message');
+                saveAIChatHistory(); // Lagre initial melding
             } else {
                 // Re-display existing chat history
                 chatHistory.forEach(msg => {
                     if (msg.role === "user") {
                         displayAIChatMessage(msg.parts[0].text, 'user-message');
                     } else if (msg.role === "model") {
-                        // Skip system/tool responses in display, just show actual AI text
-                        if (msg.parts[0].text) {
+                        if (msg.parts[0].text) { // Bare vis tekst-svar, ikke tool-calls
                             displayAIChatMessage(msg.parts[0].text, 'ai-message');
                         }
-                    } else if (msg.role === "tool") {
-                        // Optionally display tool output for debugging/transparency, but usually hidden
-                        // displayAIChatMessage("AI brukte et verktøy og fikk svar.", 'ai-message');
                     }
                 });
             }
+            chatOutput.scrollTop = chatOutput.scrollHeight; // Scroll til bunn
+            chatInput.focus();
+        }
+
+        function hideAIChatPanel() {
+            aiChatContainer.classList.add('hidden'); // Skjul chat-containeren
         }
 
         function displayAIChatMessage(message, type) {
@@ -1459,11 +1487,9 @@
             const historyJson = localStorage.getItem(AI_CHAT_HISTORY_KEY);
             if (historyJson) {
                 chatHistory = JSON.parse(historyJson);
-                // Ensure initial persona message is handled correctly if it was only thing in history
-                if (chatHistory.length > 0 && chatHistory[0].role === "user" && chatHistory[0].parts[0].text.includes("Du er en vennlig og hjelpsom AI-assistent")) {
-                    // If the first message is the persona, keep it, otherwise ensure it's not duplicated.
-                    // This logic simplifies if the history is always clean at start of load.
-                    // For now, let's assume if history is loaded, persona is handled.
+                // Filter out the initial persona message if it's the only one
+                if (chatHistory.length === 1 && chatHistory[0].role === "user" && chatHistory[0].parts[0].text.includes("Du er en vennlig og hjelpsom AI-assistent")) {
+                    chatHistory = []; // Clear if only persona is present
                 }
             } else {
                 chatHistory = [];
@@ -1477,7 +1503,7 @@
         function resetAIChat() {
             localStorage.removeItem(AI_CHAT_HISTORY_KEY); // Clear history from local storage
             chatHistory = []; // Reset in memory as well
-            loadAIChat(); // Reload chat interface, which will re-initialize history with persona
+            showAIChatPanel(); // Reload chat interface, which will re-initialize history with persona
         }
 
         async function sendMessage() {
