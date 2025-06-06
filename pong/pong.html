@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pong Game</title>
+  <style>
+    body {
+      background-color: black;
+      color: white;
+      text-align: center;
+      font-family: monospace;
+    }
+    canvas {
+      display: block;
+      margin: 2rem auto;
+      background: #222;
+      border: 2px solid white;
+    }
+  </style>
+</head>
+<body>
+  <h1>PONG</h1>
+  <canvas id="pongCanvas" width="600" height="400"></canvas>
+  <script>
+    const canvas = document.getElementById("pongCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const paddleWidth = 10, paddleHeight = 80;
+    const ballSize = 10;
+    let leftY = canvas.height / 2 - paddleHeight / 2;
+    let rightY = canvas.height / 2 - paddleHeight / 2;
+    let ballX = canvas.width / 2;
+    let ballY = canvas.height / 2;
+    let ballSpeedX = 4;
+    let ballSpeedY = 2;
+
+    document.addEventListener("keydown", e => {
+      switch (e.key) {
+        case "w": leftY -= 20; break;
+        case "s": leftY += 20; break;
+        case "ArrowUp": rightY -= 20; break;
+        case "ArrowDown": rightY += 20; break;
+      }
+    });
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Ball
+      ctx.fillRect(ballX, ballY, ballSize, ballSize);
+
+      // Paddles
+      ctx.fillRect(0, leftY, paddleWidth, paddleHeight);
+      ctx.fillRect(canvas.width - paddleWidth, rightY, paddleWidth, paddleHeight);
+
+      // Move ball
+      ballX += ballSpeedX;
+      ballY += ballSpeedY;
+
+      if (ballY <= 0 || ballY + ballSize >= canvas.height) ballSpeedY *= -1;
+
+      // Left paddle collision
+      if (ballX <= paddleWidth && ballY > leftY && ballY < leftY + paddleHeight) ballSpeedX *= -1;
+      // Right paddle collision
+      if (ballX + ballSize >= canvas.width - paddleWidth && ballY > rightY && ballY < rightY + paddleHeight) ballSpeedX *= -1;
+
+      // Score Reset
+      if (ballX < 0 || ballX > canvas.width) {
+        ballX = canvas.width / 2;
+        ballY = canvas.height / 2;
+        ballSpeedX *= -1;
+      }
+
+      requestAnimationFrame(draw);
+    }
+
+    draw();
+  </script>
+</body>
+</html>
