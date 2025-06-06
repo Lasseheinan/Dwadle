@@ -449,7 +449,7 @@
                 // Update the ID display only if the element exists
                 const userIdDisplay = document.getElementById('currentUserId');
                 if (userIdDisplay) {
-                    userIdDisplay.textContent = currentUserId.substring(0, 8); // Show only first 8 chars for brevity
+                    userIdDisplay.textContent = currentUserId; // Show full ID
                 }
                 console.log("Firebase autentiserad. Användar-ID:", currentUserId);
                 setupUserChatListener(); // Starta chatt-lyssnaren först efter autentisering
@@ -519,7 +519,7 @@
                     break;
                 // AI Chat og Bruker Chat er nå faste elementer, ikke lastet inn i gameArea
                 default:
-                    gameArea.innerHTML = '<p>Ukjent spill. Velg fra menyen.</p>';
+                    gameArea.innerHTML = '<p>Velg et spill for å starte!</p>';
             }
         }
 
@@ -1300,7 +1300,7 @@
             const date = timestamp ? new Date(timestamp.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'NÅ';
             
             messageDiv.className = `chat-message ${messageClass}`;
-            messageDiv.innerHTML = `<span class="font-bold text-xs">${userId.substring(0, 8)}...</span> <span class="text-xs text-gray-200">${date}</span><br>${message.toUpperCase()}`; // Store bokstaver
+            messageDiv.innerHTML = `<span class="font-bold text-xs">${userId}</span> <span class="text-xs text-gray-200">${date}</span><br>${message.toUpperCase()}`; // Show full ID, capitalize message
             userChatOutput.appendChild(messageDiv);
             userChatOutput.scrollTop = userChatOutput.scrollHeight;
         }
@@ -1314,6 +1314,13 @@
             if (!window.db || !window.__app_id) {
                 console.error("Firebase DB or App ID not available for chat listener.");
                 document.getElementById('userChatOutput').innerHTML = '<div class="chat-message ai-message text-red-400">FEIL: KAN IKKE KOBLE TIL CHAT.</div>';
+                return;
+            }
+
+            // Check if current user is authenticated before setting up listener
+            if (!window.auth.currentUser) {
+                console.warn("Firebase Auth not ready for User Chat listener. Waiting for authentication.");
+                document.getElementById('userChatOutput').innerHTML = '<div class="chat-message ai-message" style="color: #FFFF00;">VENTER PÅ AUTENTISERING FOR CHAT...</div>';
                 return;
             }
 
@@ -1341,7 +1348,10 @@
             const userChatLoadingIndicator = document.getElementById('userChatLoadingIndicator');
             const message = userChatInput.value.trim();
 
-            if (message === '' || !window.auth.currentUser) return;
+            if (message === '' || !window.auth.currentUser) {
+                console.warn("Melding er tom eller bruker er ikke autentisert.");
+                return;
+            }
 
             userChatInput.value = '';
             userChatSendButton.disabled = true;
@@ -1356,6 +1366,9 @@
                 });
             } catch (error) {
                 console.error("Feil ved sending av melding:", error);
+                // Optionally display error in chat output
+                document.getElementById('userChatOutput').appendChild(document.createElement('div')).outerHTML = 
+                    `<div class="chat-message ai-message" style="color: #FF00FF;">FEIL VED SENDING AV MELDING.</div>`;
             } finally {
                 userChatSendButton.disabled = false;
                 userChatLoadingIndicator.classList.add('hidden');
