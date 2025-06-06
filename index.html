@@ -139,7 +139,8 @@
 
         #guessTheNumberGame input[type="number"],
         #questionGame input[type="text"],
-        #userChatInput { /* Også for chat input */
+        #userChatInput,
+        #loginEmail, #loginPassword, #registerEmail, #registerPassword, #registerNickname { /* Added login/register inputs */
             background-color: #000000;
             border: 1px solid #00FFFF;
             color: #00FFFF;
@@ -152,7 +153,8 @@
         }
         #guessTheNumberGame input[type="number"]:focus,
         #questionGame input[type="text"]:focus,
-        #userChatInput:focus {
+        #userChatInput:focus,
+        #loginEmail:focus, #loginPassword:focus, #registerEmail:focus, #registerPassword:focus, #registerNickname:focus { /* Added login/register inputs focus */
             outline: none;
             box-shadow: 0 0 8px rgba(0, 255, 255, 0.8), inset 0 0 3px rgba(0, 255, 255, 0.5);
         }
@@ -162,7 +164,8 @@
         #questionGame button,
         #snakeGameControls button,
         #pongGameControls button,
-        #userChatContainer button:not(#userChatSendButton) { /* Spesifikk for "Tøm Chat" */
+        #userChatContainer button:not(#userChatSendButton), /* Spesifikk for "Tøm Chat", "Logg ut" */
+        #loginForm button, #registerForm button { /* Added login/register buttons */
             background-color: transparent;
             border: 2px solid #00FFFF;
             color: #00FFFF;
@@ -173,14 +176,15 @@
             box-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
             border-radius: 0;
             transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
-            margin-top: 1rem; /* Mer avstand fra input */
+            margin-top: 1rem; /* Mer avstånd fra input */
         }
 
         #guessTheNumberGame button:hover,
         #questionGame button:hover,
         #snakeGameControls button:hover,
         #pongGameControls button:hover,
-        #userChatContainer button:not(#userChatSendButton):hover {
+        #userChatContainer button:not(#userChatSendButton):hover,
+        #loginForm button:hover, #registerForm button:hover { /* Added login/register buttons hover */
             background-color: #00FFFF;
             color: #000000;
             box-shadow: 0 0 10px rgba(0, 255, 255, 0.8), 0 0 20px rgba(0, 255, 255, 0.6);
@@ -189,7 +193,8 @@
         #questionGame button:active,
         #snakeGameControls button:active,
         #pongGameControls button:active,
-        #userChatContainer button:not(#userChatSendButton):active {
+        #userChatContainer button:not(#userChatSendButton):active,
+        #loginForm button:active, #registerForm button:active { /* Added login/register buttons active */
             background-color: #00BBBB;
             box-shadow: 0 0 5px rgba(0, 255, 255, 0.8);
         }
@@ -307,10 +312,16 @@
             text-align: center;
         }
 
-        #currentUserId {
+        #currentUserIdDisplay { /* Changed ID to avoid conflict with currentUserId variable */
             color: #FFFF00; /* Gul for ID for å skille den ut */
             text-shadow: 0 0 5px rgba(255, 255, 0, 0.5);
         }
+        #currentNicknameDisplay { /* New element for nickname */
+            color: #00FF00; /* Green for nickname */
+            text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+            margin-left: 0.5rem;
+        }
+
 
         /* Skjul AI Chat i denne layouten for å matche bildet */
         #aiChatContainer {
@@ -324,52 +335,77 @@
             color: #9CA3AF; /* Gråere tekst for mindre viktig info */
         }
 
-        /* Responsivitet for små skjermer */
+        /* Responsive */
         @media (max-width: 640px) {
-            body {
-                padding: 0.5rem;
-            }
-            .main-wrapper {
-                gap: 1rem;
-                padding: 0.5rem;
-            }
-            .retro-box {
-                padding: 1rem;
-            }
-            h1 {
-                font-size: 2rem;
-                margin-bottom: 1rem;
-            }
-            .game-menu-retro {
-                gap: 1rem;
-            }
-            .retro-button {
-                width: 100%;
-                max-width: none;
-                padding: 0.6rem 1rem;
-            }
-            .game-area-retro p {
-                font-size: 1.2rem;
-            }
-            #userChatOutput {
-                min-height: 100px;
-            }
-            #userChatInputContainer {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-            #userChatSendButton {
-                width: 100%;
-            }
+            body { padding: 0.5rem; }
+            .main-wrapper { gap: 1rem; padding: 0.5rem; }
+            .retro-box { padding: 1rem; }
+            h1 { font-size: 2rem; margin-bottom: 1rem; }
+            .game-menu-retro { gap: 1rem; }
+            .retro-button { width: 100%; max-width: none; padding: 0.6rem 1rem; }
+            .game-area-retro p { font-size: 1.2rem; }
+            #userChatOutput { min-height: 100px; }
+            #userChatInputContainer { flex-direction: column; gap: 0.5rem; }
+            #userChatSendButton { width: 100%; }
             #guessTheNumberGame input[type="number"],
             #questionGame input[type="text"],
-            #userChatInput {
+            #userChatInput, #loginEmail, #loginPassword, #registerEmail, #registerPassword, #registerNickname {
                 max-width: 100%;
             }
-             #snakeCanvas, #pongCanvas {
-                width: 100%; /* Ensure canvas scales down */
-                height: auto; /* Maintain aspect ratio */
-             }
+            #snakeCanvas, #pongCanvas {
+                width: 100%;
+                height: auto;
+            }
+        }
+
+        /* Authentication Modal Styling */
+        .auth-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9); /* Semi-transparent black background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000; /* Ensure it's on top */
+            backdrop-filter: blur(5px); /* Optional: blur background content */
+        }
+        .auth-modal-content {
+            composes: retro-box; /* Inherit retro box style */
+            padding: 2.5rem;
+            max-width: 450px;
+            width: 90%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .auth-modal-content h2 {
+            font-size: 2.25rem;
+            color: #00FFFF;
+            text-shadow: 0 0 8px rgba(0, 255, 255, 0.8);
+            margin-bottom: 1rem;
+            letter-spacing: 0.05em;
+        }
+        .auth-modal-content input {
+            width: 100%;
+            margin-bottom: 0.75rem;
+        }
+        .auth-modal-content button {
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+        .auth-toggle {
+            color: #FFFF00; /* Yellow link color */
+            cursor: pointer;
+            text-decoration: underline;
+            margin-top: 1rem;
+        }
+        .auth-error {
+            color: #FF00FF; /* Magenta for errors */
+            margin-top: 1rem;
+            font-size: 0.9rem;
         }
     </style>
 </head>
@@ -395,14 +431,15 @@
             <div id="userChatOutput" class="flex-grow overflow-y-auto mb-4">
                 <!-- Bruker chat messages will appear here -->
             </div>
-            <p id="userChatLoadingIndicator" class="text-center italic text-gray-400 hidden">Sender melding...</p>
+            <p id="userChatLoadingIndicator" class="text-center italic text-gray-400 hidden">SENDER MELDING...</p>
             <div id="userChatInputContainer" class="flex gap-2">
                 <input type="text" id="userChatInput" placeholder="SKRIV MELDING..." class="flex-grow">
                 <button id="userChatSendButton" onclick="sendMessageUserChat()">SEND</button>
             </div>
             <div class="flex flex-wrap justify-between items-center mt-4 text-sm text-gray-400">
-                <span>DIN ID: <span id="currentUserId" class="font-mono text-white text-xs break-all">LASTER...</span></span>
+                <span>BRUKER: <span id="currentNicknameDisplay" class="font-mono text-white text-xs break-all">LASTER...</span></span>
                 <button onclick="clearUserChat()" class="retro-button px-3 py-1 text-sm">TØM CHAT</button>
+                <button onclick="logoutUser()" class="retro-button px-3 py-1 text-sm ml-2">LOGG UT</button>
             </div>
         </div>
 
@@ -412,11 +449,59 @@
         </footer>
     </div>
 
+    <!-- Authentication Modal -->
+    <div id="authModal" class="auth-modal hidden">
+        <div class="auth-modal-content">
+            <div id="loginSection">
+                <h2>LOGG INN</h2>
+                <input type="email" id="loginEmail" placeholder="E-POST" class="w-full">
+                <input type="password" id="loginPassword" placeholder="PASSORD" class="w-full">
+                <button onclick="loginUser()">LOGG INN</button>
+                <p class="auth-toggle" onclick="toggleAuthMode()">HAR IKKE KONTO? REGISTRER DEG</p>
+                <p id="loginError" class="auth-error hidden"></p>
+            </div>
+
+            <div id="registerSection" class="hidden">
+                <h2>REGISTRER</h2>
+                <input type="email" id="registerEmail" placeholder="E-POST" class="w-full">
+                <input type="password" id="registerPassword" placeholder="PASSORD" class="w-full">
+                <input type="text" id="registerNickname" placeholder="VELG KALLENAVN" class="w-full">
+                <button onclick="registerUser()">REGISTRER DEG</button>
+                <p class="auth-toggle" onclick="toggleAuthMode()">HAR ALLEREDE KONTO? LOGG INN</p>
+                <p id="registerError" class="auth-error hidden"></p>
+            </div>
+        </div>
+    </div>
+
+
     <!-- Firebase SDK - IKKE ENDRE URL -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, orderBy, serverTimestamp, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { 
+            getAuth, 
+            signInAnonymously, 
+            signInWithCustomToken, 
+            onAuthStateChanged,
+            createUserWithEmailAndPassword, // Added for registration
+            signInWithEmailAndPassword,    // Added for login
+            signOut                        // Added for logout
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            getDoc, 
+            addDoc, 
+            setDoc, 
+            updateDoc, 
+            deleteDoc, 
+            onSnapshot, 
+            collection, 
+            query, 
+            where, 
+            orderBy, 
+            serverTimestamp, 
+            getDocs 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Globala variabler (definieras av Canvas-miljön)
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -428,65 +513,197 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
         let currentUserId = 'anonymous'; // Standardverdi
+        let currentNickname = 'LASTER...'; // New: Store current user's nickname
+        let unsubscribeUserChat = null; // To manage the chat listener subscription
 
-        // Funktion för att hantera användarinloggning
-        async function authenticateFirebase() {
-            try {
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (error) {
-                console.error("Firebase autentiseringsfel:", error);
-            }
-        }
-
-        // Lyssnare för autentiseringstillstånd
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUserId = user.uid;
-                // Update the ID display only if the element exists
-                const userIdDisplay = document.getElementById('currentUserId');
-                if (userIdDisplay) {
-                    userIdDisplay.textContent = currentUserId; // Show full ID
-                }
-                console.log("Firebase autentiserad. Användar-ID:", currentUserId);
-                setupUserChatListener(); // Starta chatt-lyssnaren först efter autentisering
-            } else {
-                currentUserId = 'anonymous'; // Fallback
-                const userIdDisplay = document.getElementById('currentUserId');
-                 if (userIdDisplay) {
-                    userIdDisplay.textContent = currentUserId + ' (ikke logget inn)';
-                }
-                console.log("Firebase: Ingen användare inloggad.");
-            }
-        });
-
-        // Exponera globalt för användning i script-taggen
+        // Exposed globally for use in script-tag
         window.db = db;
         window.auth = auth;
-        window.currentUserId = currentUserId;
+        window.currentUserId = currentUserId; // Will be updated on auth state change
+        window.currentNickname = currentNickname; // Will be updated
         window.serverTimestamp = serverTimestamp;
         window.collection = collection;
         window.addDoc = addDoc;
         window.query = query;
         window.orderBy = orderBy;
         window.onSnapshot = onSnapshot;
-        window.getDocs = getDocs; // Legg til getDocs
-        window.doc = doc; // Legg til doc
-        window.deleteDoc = deleteDoc; // Legg til deleteDoc
+        window.getDocs = getDocs;
+        window.doc = doc;
+        window.deleteDoc = deleteDoc;
+        window.getDoc = getDoc; // Added getDoc
 
-        // Initialisera Firebase autentisering vid sidladdning
-        authenticateFirebase();
+        // --- Authentication Functions ---
+        async function authenticateFirebase() {
+            // No longer automatically sign in anonymously or with custom token on load
+            // The modal will handle login/registration
+            console.log("Firebase auth setup. Waiting for user login/registration.");
+        }
 
-    </script>
+        onAuthStateChanged(auth, async (user) => {
+            const currentNicknameDisplay = document.getElementById('currentNicknameDisplay');
+            const authModal = document.getElementById('authModal');
+            
+            if (user) {
+                currentUserId = user.uid;
+                // Try to fetch nickname
+                const nicknameDocRef = doc(db, `artifacts/${appId}/public/data/nicknames`, currentUserId);
+                const nicknameDocSnap = await getDoc(nicknameDocRef);
+
+                if (nicknameDocSnap.exists()) {
+                    currentNickname = nicknameDocSnap.data().nickname;
+                } else {
+                    // If user exists but no nickname is set (e.g., migrated from anonymous or new Email/Password user without nickname)
+                    // Prompt for nickname if not set
+                    if (currentNicknameDisplay) currentNicknameDisplay.textContent = 'VELG NICK...'; // Show temporary state
+                    showAuthModal('register', true); // Force register view to get nickname
+                    console.warn("User logged in but no nickname found. Prompting for nickname.");
+                    return; // Prevent further chat setup until nickname is chosen
+                }
+
+                if (currentNicknameDisplay) currentNicknameDisplay.textContent = currentNickname.toUpperCase();
+                console.log(`Firebase autentisert. Bruker-ID: ${currentUserId}, Kallenavn: ${currentNickname}`);
+                authModal.classList.add('hidden'); // Hide modal if logged in
+                setupUserChatListener(); // Start chat listener once authenticated and nickname set
+            } else {
+                currentUserId = 'anonymous';
+                currentNickname = 'GJEST'; // Fallback
+                if (currentNicknameDisplay) currentNicknameDisplay.textContent = currentNickname;
+                console.log("Firebase: Ingen bruker logget inn.");
+                // Unsubscribe chat listener if user logs out
+                if (unsubscribeUserChat) {
+                    unsubscribeUserChat();
+                    unsubscribeUserChat = null;
+                    console.log("Chat listener unsubscribed.");
+                }
+                // Show modal if not logged in
+                showAuthModal('login');
+            }
+        });
+
+        // Expose login/register/logout globally
+        window.loginUser = loginUser;
+        window.registerUser = registerUser;
+        window.logoutUser = logoutUser;
+        window.toggleAuthMode = toggleAuthMode;
+
+        async function registerUser() {
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const nickname = document.getElementById('registerNickname').value.trim();
+            const registerError = document.getElementById('registerError');
+
+            registerError.classList.add('hidden'); // Clear previous errors
+
+            if (!email || !password || !nickname) {
+                registerError.textContent = "ALLE FELT MÅ FYLLES UT.";
+                registerError.classList.remove('hidden');
+                return;
+            }
+            if (password.length < 6) {
+                registerError.textContent = "PASSORD MÅ VÆRE MINST 6 TEGN.";
+                registerError.classList.remove('hidden');
+                return;
+            }
+
+            // Check if nickname already exists
+            const nicknamesRef = collection(db, `artifacts/${appId}/public/data/nicknames`);
+            const q = query(nicknamesRef, where("nickname", "==", nickname));
+            const querySnapshot = await getDocs(q);
+
+            if (!querySnapshot.empty) {
+                registerError.textContent = "KALLENAVN ER ALLEREDE TATT. VELG ET ANNET.";
+                registerError.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                
+                // Store nickname in Firestore
+                await setDoc(doc(db, `artifacts/${appId}/public/data/nicknames`, user.uid), {
+                    nickname: nickname,
+                    createdAt: serverTimestamp()
+                });
+
+                console.log("Bruker registrert og kallenavn satt:", user.uid, nickname);
+                // onAuthStateChanged will handle hiding modal and setting up chat
+            } catch (error) {
+                console.error("Registreringsfeil:", error.message);
+                registerError.textContent = `FEIL: ${error.message.toUpperCase()}`;
+                registerError.classList.remove('hidden');
+            }
+        }
+
+        async function loginUser() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const loginError = document.getElementById('loginError');
+
+            loginError.classList.add('hidden'); // Clear previous errors
+
+            if (!email || !password) {
+                loginError.textContent = "E-POST OG PASSORD MÅ FYLLES UT.";
+                loginError.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                console.log("Bruker logget inn.");
+                // onAuthStateChanged will handle hiding modal and setting up chat
+            } catch (error) {
+                console.error("Innloggingsfeil:", error.message);
+                loginError.textContent = `FEIL: ${error.message.toUpperCase()}`;
+                loginError.classList.remove('hidden');
+            }
+        }
+
+        async function logoutUser() {
+            try {
+                await signOut(auth);
+                console.log("Bruker logget ut.");
+                // onAuthStateChanged will handle showing modal
+            } catch (error) {
+                console.error("Feil ved utlogging:", error.message);
+                alert("FEIL VED UTLOGGING: " + error.message); // Use custom message box in real app
+            }
+        }
+
+        // --- Auth Modal Control ---
+        let forceRegister = false; // Flag to force register view if nickname is missing
+
+        function showAuthModal(mode = 'login', force = false) {
+            const authModal = document.getElementById('authModal');
+            const loginSection = document.getElementById('loginSection');
+            const registerSection = document.getElementById('registerSection');
+            
+            forceRegister = force; // Set the force flag
+
+            if (mode === 'login' && !forceRegister) {
+                loginSection.classList.remove('hidden');
+                registerSection.classList.add('hidden');
+            } else {
+                loginSection.classList.add('hidden');
+                registerSection.classList.remove('hidden');
+            }
+            authModal.classList.remove('hidden');
+        }
+
+        function toggleAuthMode() {
+            if (forceRegister) return; // Cannot toggle if forced to register (missing nickname)
+            const loginSection = document.getElementById('loginSection');
+            const registerSection = document.getElementById('registerSection');
+            loginSection.classList.toggle('hidden');
+            registerSection.classList.toggle('hidden');
+            document.getElementById('loginError').classList.add('hidden');
+            document.getElementById('registerError').classList.add('hidden');
+        }
 
 
-    <script>
-        // Referanse til spillområdet
+        // --- Referanse til spillområdet ---
         const gameArea = document.getElementById('gameArea');
-        const userChatContainer = document.getElementById('userChatContainer'); // Referanse til brukerchat-containeren
+        const userChatContainer = document.getElementById('userChatContainer');
         // AI Chat container er fjernet/skjult permanent i denne layouten.
 
         // requestAnimationFrame ID for Pong, so it can be cancelled
@@ -1275,68 +1492,91 @@
         async function googleSearch(queries) { /* No-op in this UI */ return []; }
 
         // --- Bruker Chat (Firestore) ---
-        let userChatUnsubscribe = null;
+        let nicknameCache = {}; // Cache for nicknames to reduce Firestore reads
 
-        // Note: userChatContainer is no longer hidden/shown by loadGame.
-        // It's a persistent bottom element now, managed by its own init logic.
+        async function getNickname(userId) {
+            if (nicknameCache[userId]) {
+                return nicknameCache[userId];
+            }
+            const nicknameDocRef = doc(db, `artifacts/${appId}/public/data/nicknames`, userId);
+            const nicknameDocSnap = await getDoc(nicknameDocRef);
+            if (nicknameDocSnap.exists()) {
+                const nickname = nicknameDocSnap.data().nickname;
+                nicknameCache[userId] = nickname; // Store in cache
+                return nickname;
+            }
+            return 'UKJENT'; // Fallback if nickname not found
+        }
 
-        // The user ID display is updated when Firebase Auth is ready in the module script.
-        // `userChatContainer` is always present, no need to hide/show its class.
-        // The `showUserChatPanel` and `hideUserChatPanel` functions are removed
-        // as the user chat is now a permanent fixture matching the image.
 
         function displayUserChatMessage(message, userId, timestamp) {
             const userChatOutput = document.getElementById('userChatOutput');
-            if (!userChatOutput) return; // Ensure element exists
+            if (!userChatOutput) return;
 
             const messageDiv = document.createElement('div');
             
             let messageClass = 'user-chat-message';
             // Use the actual currentUserId from the global window scope
-            if (userId === window.currentUserId) {
+            if (userId === window.auth.currentUser?.uid) { // Compare with authenticated user's UID
                 messageClass = 'current-user-chat-message';
             }
 
             const date = timestamp ? new Date(timestamp.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'NÅ';
             
-            messageDiv.className = `chat-message ${messageClass}`;
-            messageDiv.innerHTML = `<span class="font-bold text-xs">${userId}</span> <span class="text-xs text-gray-200">${date}</span><br>${message.toUpperCase()}`; // Show full ID, capitalize message
-            userChatOutput.appendChild(messageDiv);
-            userChatOutput.scrollTop = userChatOutput.scrollHeight;
+            // Get nickname asynchronously and then append message
+            getNickname(userId).then(nick => {
+                messageDiv.className = `chat-message ${messageClass}`;
+                messageDiv.innerHTML = `<span class="font-bold text-xs">${nick.toUpperCase()}</span> <span class="text-xs text-gray-200">${date}</span><br>${message.toUpperCase()}`;
+                userChatOutput.appendChild(messageDiv);
+                userChatOutput.scrollTop = userChatOutput.scrollHeight;
+            }).catch(error => {
+                console.error("Error fetching nickname for message:", error);
+                messageDiv.className = `chat-message ${messageClass}`;
+                messageDiv.innerHTML = `<span class="font-bold text-xs">FEIL BRUKER</span> <span class="text-xs text-gray-200">${date}</span><br>${message.toUpperCase()}`;
+                userChatOutput.appendChild(messageDiv);
+                userChatOutput.scrollTop = userChatOutput.scrollHeight;
+            });
         }
 
         function setupUserChatListener() {
-            if (userChatUnsubscribe) {
-                userChatUnsubscribe();
-            }
-
             // Check if db and appId are available from the module script
             if (!window.db || !window.__app_id) {
                 console.error("Firebase DB or App ID not available for chat listener.");
-                document.getElementById('userChatOutput').innerHTML = '<div class="chat-message ai-message text-red-400">FEIL: KAN IKKE KOBLE TIL CHAT.</div>';
+                document.getElementById('userChatOutput').innerHTML = '<div class="chat-message user-chat-message text-red-400">FEIL: KAN IKKE KOBLE TIL CHAT.</div>';
                 return;
             }
 
             // Check if current user is authenticated before setting up listener
             if (!window.auth.currentUser) {
                 console.warn("Firebase Auth not ready for User Chat listener. Waiting for authentication.");
-                document.getElementById('userChatOutput').innerHTML = '<div class="chat-message ai-message" style="color: #FFFF00;">VENTER PÅ AUTENTISERING FOR CHAT...</div>';
+                document.getElementById('userChatOutput').innerHTML = '<div class="chat-message user-chat-message" style="color: #FFFF00;">VENTER PÅ AUTENTISERING FOR CHAT...</div>';
+                // Also clear previous messages
+                document.getElementById('userChatOutput').innerHTML = '';
                 return;
             }
+
+            // Unsubscribe existing listener if any
+            if (unsubscribeUserChat) {
+                unsubscribeUserChat();
+                unsubscribeUserChat = null;
+                console.log("Existing chat listener unsubscribed.");
+            }
+             document.getElementById('userChatOutput').innerHTML = '<div class="chat-message user-chat-message" style="color: #FFFF00;">Laster chat-historikk...</div>';
+
 
             const chatCollectionRef = window.collection(window.db, `artifacts/${window.__app_id}/public/data/user_chats`);
             const q = window.query(chatCollectionRef, window.orderBy('timestamp', 'asc'));
 
-            userChatUnsubscribe = window.onSnapshot(q, (snapshot) => {
+            unsubscribeUserChat = window.onSnapshot(q, (snapshot) => {
                 const userChatOutput = document.getElementById('userChatOutput');
-                userChatOutput.innerHTML = ''; // Tøm for å laste inn på nytt
+                userChatOutput.innerHTML = ''; // Clear to reload all messages
                 snapshot.forEach((doc) => {
                     const data = doc.data();
                     displayUserChatMessage(data.message, data.userId, data.timestamp);
                 });
             }, (error) => {
                 console.error("Feil ved henting av chatmeldinger:", error);
-                document.getElementById('userChatOutput').innerHTML = '<div class="chat-message ai-message text-red-400">FEIL VED LASTING AV CHATMELDINGER.</div>';
+                document.getElementById('userChatOutput').innerHTML = '<div class="chat-message user-chat-message text-red-400">FEIL VED LASTING AV CHATMELDINGER.</div>';
             });
             console.log("User chat listener subscribed.");
         }
@@ -1348,8 +1588,15 @@
             const userChatLoadingIndicator = document.getElementById('userChatLoadingIndicator');
             const message = userChatInput.value.trim();
 
-            if (message === '' || !window.auth.currentUser) {
-                console.warn("Melding er tom eller bruker er ikke autentisert.");
+            if (message === '') {
+                console.warn("Melding er tom.");
+                return;
+            }
+            if (!window.auth.currentUser) {
+                console.warn("Bruker er ikke autentisert. Kan ikke sende melding.");
+                // Optionally show a message to the user that they need to log in
+                document.getElementById('userChatOutput').appendChild(document.createElement('div')).outerHTML = 
+                    `<div class="chat-message user-chat-message" style="color: #FF00FF;">FEIL: DU MÅ VÆRE LOGGET INN FOR Å SENDE MELDINGER.</div>`;
                 return;
             }
 
@@ -1360,15 +1607,14 @@
             try {
                 const chatCollectionRef = window.collection(window.db, `artifacts/${window.__app_id}/public/data/user_chats`);
                 await window.addDoc(chatCollectionRef, {
-                    userId: window.currentUserId,
+                    userId: window.auth.currentUser.uid, // Use authenticated user's UID
                     message: message,
                     timestamp: window.serverTimestamp()
                 });
             } catch (error) {
                 console.error("Feil ved sending av melding:", error);
-                // Optionally display error in chat output
                 document.getElementById('userChatOutput').appendChild(document.createElement('div')).outerHTML = 
-                    `<div class="chat-message ai-message" style="color: #FF00FF;">FEIL VED SENDING AV MELDING.</div>`;
+                    `<div class="chat-message user-chat-message" style="color: #FF00FF;">FEIL VED SENDING AV MELDING.</div>`;
             } finally {
                 userChatSendButton.disabled = false;
                 userChatLoadingIndicator.classList.add('hidden');
@@ -1394,9 +1640,16 @@
                     document.body.removeChild(confirmClear);
                     const userChatOutput = document.getElementById('userChatOutput');
                     if (userChatOutput) {
-                        userChatOutput.innerHTML = '<div class="chat-message ai-message" style="color: #FFFF00;">TØMMER CHAT...</div>'; // Feedback til bruker
+                        userChatOutput.innerHTML = '<div class="chat-message user-chat-message" style="color: #FFFF00;">TØMMER CHAT...</div>'; // Feedback til bruker
                     }
                     try {
+                        // Check if user is authenticated before allowing delete
+                        if (!window.auth.currentUser) {
+                            throw new Error("Du må være logget inn for å tømme chatten.");
+                        }
+                        // Only allow admin (or specific user) to clear if rules are set this way
+                        // For simplicity, current rules allow any authenticated user to write to public_data/user_chats
+                        // but a more robust app would have specific admin roles for clearing all
                         const chatCollectionRef = window.collection(window.db, `artifacts/${window.__app_id}/public/data/user_chats`);
                         const q = window.query(chatCollectionRef);
                         const querySnapshot = await window.getDocs(q);
@@ -1411,7 +1664,7 @@
                     } catch (error) {
                         console.error("Feil ved tømming av chat-historikk:", error);
                         if (userChatOutput) {
-                            userChatOutput.innerHTML = '<div class="chat-message ai-message text-red-400">FEIL VED TØMMING AV CHAT.</div>';
+                            userChatOutput.innerHTML = `<div class="chat-message user-chat-message text-red-400">FEIL VED TØMMING AV CHAT: ${error.message.toUpperCase()}</div>`;
                         }
                         resolve(false); // Indicate failure
                     }
@@ -1426,10 +1679,10 @@
 
         // Laster "Gjett Tallet"-spillet automatisk når siden lastes som standard
         window.onload = () => {
-            // Sørg for at Firebase initialiseres først, deretter lastes spillet
-            // Autentiseringslogikken i type="module" scriptet kjører parallelt.
-            // onAuthStateChanged vil kalle setupUserChatListener når brukeren er klar.
+            // Initialiserer spillområdet først
             loadGame('guessTheNumber');
+            // onAuthStateChanged vil deretter håndtere visning av autentiseringsmodalen
+            // og oppsett av chat-lytteren når brukeren er logget inn/registrert.
         };
 
     </script>
