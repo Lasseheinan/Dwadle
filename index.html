@@ -3,567 +3,491 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minispill | Bruk Tid</title>
+    <title>Minispill | 1980s Retro</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom font for better readability */
+        /* Grunnleggende kropp og bakgrunn for 1980s terminalfølelse */
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #1f2937; /* Mørk bakgrunn */
-            color: #f3f4f6; /* Lys tekstfarge */
+            font-family: 'monospace', sans-serif; /* Retro terminal-font */
+            background-color: #000000; /* Dyp svart bakgrunn */
+            color: #00FFFF; /* Neon cyan/blå for all tekst */
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             padding: 1.5rem;
             box-sizing: border-box;
+            /* Subtil retro-effekt (simulerer scanlines/støy) */
+            background-image: linear-gradient(rgba(0, 255, 255, 0.05) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 3px 3px;
         }
 
-        .container {
-            background-color: #374151; /* Mørkere grå for hovedcontainer */
-            border-radius: 1.5rem; /* runde hjørner */
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1); /* skygge */
-            padding: 2.5rem;
+        /* Hovedcontainer for alle elementer (stablingskontekst) */
+        .main-wrapper {
             width: 100%;
-            max-width: 1200px; /* Økt maks bredde for å få plass til chat side ved side */
-            display: grid; /* Bruk grid for layout */
-            grid-template-areas:
-                "header header"
-                "menu menu"
-                "game chat"
-                "footer footer"; /* Standard layout for store skjermer */
-            grid-template-columns: 1fr 350px; /* Spillområde og chat-kolonne */
-            gap: 2rem; /* Gap mellom elementer */
+            max-width: 900px; /* Maks bredde for lesbarhet */
+            display: flex;
+            flex-direction: column;
+            gap: 2rem; /* Mellomrom mellom boksene */
         }
 
-        header {
-            grid-area: header;
+        /* Felles stil for alle de store, rektangulære boksene */
+        .retro-box {
+            background-color: #000000; /* Svart bakgrunn for boksene */
+            border: 2px solid #00FFFF; /* Neon cyan kant */
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5), inset 0 0 5px rgba(0, 255, 255, 0.3); /* Neon glød */
+            padding: 1.5rem;
             text-align: center;
-            margin-bottom: 1rem;
+        }
+
+        /* Topp-boks: Tittel og menyknapper */
+        .top-box {
+            composes: retro-box; /* Arver fra retro-box */
+            padding-top: 2rem;
+            padding-bottom: 2rem;
         }
 
         h1 {
-            font-size: 3rem; /* Stor tittel */
+            font-size: 3rem; /* Stor og dominerende tittel */
             font-weight: bold;
-            color: #a78bfa; /* Lys lilla */
-            margin-bottom: 0.5rem;
+            color: #00FFFF; /* Neon cyan */
+            text-shadow: 0 0 8px rgba(0, 255, 255, 0.8), 0 0 15px rgba(0, 255, 255, 0.6); /* Kraftig neon glød */
+            margin-bottom: 2rem;
+            letter-spacing: 0.1em; /* Mellomrom mellom bokstaver for retro-følelse */
         }
 
-        .game-menu {
-            grid-area: menu;
+        .game-menu-retro {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 1rem;
-            margin-bottom: 2rem;
+            gap: 1.5rem;
         }
 
-        .game-button {
-            background-image: linear-gradient(to right, #6366f1, #8b5cf6); /* Gradient-knapp */
-            color: white;
-            border-radius: 0.75rem;
+        /* Stil for menyknappene */
+        .retro-button {
+            background-color: transparent;
+            border: 2px solid #00FFFF; /* Neon cyan kant */
+            color: #00FFFF; /* Neon cyan tekst */
             padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            text-align: center;
-            transition: all 0.2s ease-in-out;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
             cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            border: none;
-            flex: 1 1 auto; /* Fleksibel bredde */
-            max-width: 200px; /* Maks bredde for hver knapp */
+            transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 0 5px rgba(0, 255, 255, 0.3); /* Subtil glød */
+            border-radius: 0; /* Skarpe kanter */
         }
 
-        .game-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        .retro-button:hover {
+            background-color: #00FFFF; /* Fyll med farge ved hover */
+            color: #000000; /* Svart tekst ved hover */
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.8), 0 0 20px rgba(0, 255, 255, 0.6); /* Mer intens glød */
+        }
+        .retro-button:active {
+            background-color: #00BBBB; /* Litt mørkere cyan ved klikk */
+            box-shadow: 0 0 5px rgba(0, 255, 255, 0.8);
+        }
+        .retro-button:disabled {
+            border-color: #4B5563;
+            color: #6B7280;
+            cursor: not-allowed;
+            opacity: 0.6;
+            background-color: transparent;
+            box-shadow: none;
+        }
+        .retro-button:disabled:hover {
+            background-color: transparent;
+            color: #6B7280;
+            box-shadow: none;
         }
 
-        .game-area {
-            grid-area: game;
-            background-color: #4b5563; /* Lysere grå for spillområdet */
-            border-radius: 1rem;
-            padding: 2rem;
-            min-height: 300px; /* Minimum høyde for spillinnhold */
+
+        /* Midtre boks: Spillområde */
+        .game-area-retro {
+            composes: retro-box; /* Arver fra retro-box */
+            min-height: 350px; /* Minimum høyde */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            text-align: center;
         }
 
-        /* Spesifikke stiler for "Gjett Tallet"-spillet */
-        #guessTheNumberGame h2 {
-            font-size: 2.25rem;
-            font-weight: bold;
-            color: #34d399; /* Grønn tittel for spillet */
-            margin-bottom: 1.5rem;
-        }
-
-        #guessTheNumberGame input[type="number"] {
-            background-color: #6b7280; /* Mørkere inputfelt */
-            color: #f3f4f6;
-            border-radius: 0.5rem;
-            padding: 0.75rem 1rem;
-            border: 1px solid #4b5563;
-            width: 100%;
-            max-width: 200px;
-            margin-bottom: 1rem;
-            text-align: center;
-            font-size: 1.25rem;
-        }
-
-        #guessTheNumberGame button {
-            background-image: linear-gradient(to right, #10b981, #059669); /* Grønn gradient knapp */
-            color: white;
-            border-radius: 0.5rem;
-            padding: 0.75rem 1.25rem;
-            font-weight: 600;
-            transition: all 0.2s ease-in-out;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        #guessTheNumberGame button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        #guessTheNumberGame #gameMessage {
-            margin-top: 1.5rem;
-            font-size: 1.125rem;
-            font-weight: 500;
-        }
-
-        #guessTheNumberGame #attemptsCount {
-            margin-top: 0.5rem;
-            font-size: 0.95rem;
-            color: #d1d5db; /* Lysere grå tekst */
-        }
-
-        /* Spesifikke stiler for "Spørsmålsspill" */
-        #questionGame h2 {
-            font-size: 2.25rem;
-            font-weight: bold;
-            color: #fca311; /* Oransje tittel for spillet */
-            margin-bottom: 1.5rem;
-        }
-        #questionGame #questionDisplay {
+        .game-area-retro p {
+            color: #00FFFF;
             font-size: 1.5rem;
-            margin-bottom: 1.5rem;
-            color: #e0e7ff; /* Lysere tekst for spørsmål */
-            min-height: 3em; /* Sikrer litt plass selv med kort spørsmål */
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            letter-spacing: 0.03em;
         }
-        #questionGame input[type="text"] {
-            background-color: #6b7280;
-            color: #f3f4f6;
-            border-radius: 0.5rem;
-            padding: 0.75rem 1rem;
-            border: 1px solid #4b5563;
-            width: 100%;
-            max-width: 300px;
+
+        /* Spillspesifikke stiler inni spillområdet (justert til neon-tema) */
+        #guessTheNumberGame, #questionGame, #snakeGame, #pongGame {
+            background-color: #000000; /* Svart bakgrunn for spilldivs */
+            border: none; /* Fjern intern ramme om nødvendig */
+            box-shadow: none; /* Fjern intern skygge om nødvendig */
+            padding: 0; /* Fjern padding om nødvendig for renere look */
+            width: 100%; /* Sørg for at den fyller game-area-retro */
+            max-width: none;
+        }
+
+        #guessTheNumberGame h2, #questionGame h2, #snakeGame h2, #pongGame h2 {
+            color: #00FFFF; /* Neon cyan */
+            text-shadow: 0 0 8px rgba(0, 255, 255, 0.8);
             margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+
+        #guessTheNumberGame input[type="number"],
+        #questionGame input[type="text"],
+        #userChatInput { /* Også for chat input */
+            background-color: #000000;
+            border: 1px solid #00FFFF;
+            color: #00FFFF;
+            box-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+            padding: 0.6rem 1rem;
+            border-radius: 0;
             text-align: center;
-            font-size: 1.25rem;
-            focus:outline-none focus:ring-2 focus:ring-yellow-500;
-        }
-        #questionGame .button-group button {
-            background-image: linear-gradient(to right, #f59e0b, #d97706); /* Oransje gradient knapp */
-            margin: 0.5rem;
-        }
-        #questionGame #scoreDisplay {
-            margin-top: 1rem;
-            font-size: 1rem;
-            color: #d1d5db;
-        }
-        #questionGame #answerMessage {
-            margin-top: 1rem;
             font-size: 1.125rem;
-            font-weight: 500;
+            letter-spacing: 0.03em;
         }
-        #leaderboard-container {
-            background-color: #374151; /* Mørkere grå */
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            margin-top: 2rem;
-            width: 100%;
-            max-width: 400px; /* Begrenset bredde for lesbarhet */
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
-            text-align: left;
+        #guessTheNumberGame input[type="number"]:focus,
+        #questionGame input[type="text"]:focus,
+        #userChatInput:focus {
+            outline: none;
+            box-shadow: 0 0 8px rgba(0, 255, 255, 0.8), inset 0 0 3px rgba(0, 255, 255, 0.5);
         }
-        #leaderboard-container h3 {
-            font-size: 1.75rem;
+
+        /* Knapper inne i spill- og chat-områdene */
+        #guessTheNumberGame button,
+        #questionGame button,
+        #snakeGameControls button,
+        #pongGameControls button,
+        #userChatContainer button:not(#userChatSendButton) { /* Spesifikk for "Tøm Chat" */
+            background-color: transparent;
+            border: 2px solid #00FFFF;
+            color: #00FFFF;
+            padding: 0.6rem 1.2rem;
             font-weight: bold;
-            color: #fca311; /* Oransje tittel */
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-        #leaderboard-container ol {
-            list-style: none; /* Fjern standard liste-prikker */
-            padding: 0;
-            margin: 0;
-        }
-        #leaderboard-container li {
-            background-color: #4b5563; /* Litt lysere grå for liste-elementer */
-            padding: 0.75rem 1rem;
-            border-radius: 0.5rem;
-            margin-bottom: 0.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 1rem;
-            color: #e0e7ff;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        }
-        #leaderboard-container li:last-child {
-            margin-bottom: 0;
-        }
-        #leaderboard-container .leaderboard-score {
-            font-weight: bold;
-            color: #34d399; /* Grønn for poeng */
-        }
-        #nicknameInputContainer {
-            margin-top: 1.5rem;
-            background-color: #6b7280;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-        #nicknameInputContainer input {
-            background-color: #4b5563;
-            border: 1px solid #374151;
-            color: #f3f4f6;
-            padding: 0.5rem;
-            border-radius: 0.25rem;
-        }
-        #nicknameInputContainer button {
-            background-image: linear-gradient(to right, #8b5cf6, #a78bfa); /* Lilla gradient */
-            padding: 0.5rem 1rem;
-            border-radius: 0.25rem;
-            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            box-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+            border-radius: 0;
+            transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+            margin-top: 1rem; /* Mer avstand fra input */
         }
 
-        /* Spesifikke stiler for Retro Spill-seksjonen */
-        .retro-game-menu {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            max-width: 600px; /* Passende bredde for retro-meny */
+        #guessTheNumberGame button:hover,
+        #questionGame button:hover,
+        #snakeGameControls button:hover,
+        #pongGameControls button:hover,
+        #userChatContainer button:not(#userChatSendButton):hover {
+            background-color: #00FFFF;
+            color: #000000;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.8), 0 0 20px rgba(0, 255, 255, 0.6);
+        }
+        #guessTheNumberGame button:active,
+        #questionGame button:active,
+        #snakeGameControls button:active,
+        #pongGameControls button:active,
+        #userChatContainer button:not(#userChatSendButton):active {
+            background-color: #00BBBB;
+            box-shadow: 0 0 5px rgba(0, 255, 255, 0.8);
         }
 
-        .retro-game-button {
-            background-image: linear-gradient(to right, #06b6d4, #0ea5e9); /* Blå gradient */
-            color: white;
-            border-radius: 0.75rem;
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            text-align: center;
-            transition: all 0.2s ease-in-out;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            border: none;
-            flex: 1 1 auto;
-            max-width: 180px;
+        /* Snake og Pong Canvas */
+        #snakeCanvas, #pongCanvas {
+            background-color: #0A0A0A; /* Nesten svart for spillområdet */
+            border: 2px solid #00FFFF;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.6), inset 0 0 5px rgba(0, 255, 255, 0.3);
+            border-radius: 0;
+            width: 100%; /* For responsive canvas */
+            height: auto; /* Maintain aspect ratio */
+            max-width: 400px; /* Maks bredde som i forrige versjon */
+            aspect-ratio: 1 / 1; /* Behold kvadratisk for snake */
         }
-
-        .retro-game-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        /* Snake Game Canvas */
-        #snakeCanvas {
-            background-color: #1a4d2e; /* Mørk grønn for slangespillet */
-            border: 2px solid #34d399;
-            border-radius: 0.5rem;
-            cursor: pointer;
-        }
-        #snakeGameControls {
-            margin-top: 1.5rem;
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        #snakeGameControls button {
-            background-image: linear-gradient(to right, #a78bfa, #c084fc); /* Lilla gradient */
-            color: white;
-            border-radius: 0.5rem;
-            padding: 0.75rem 1.25rem;
-            font-weight: 600;
-            transition: all 0.2s ease-in-out;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-        #snakeGameControls button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        }
-        #snakeScore {
-            margin-top: 1rem;
-            font-size: 1.25rem;
-            font-weight: bold;
-            color: #34d399;
-        }
-
-        /* Pong Game Canvas */
         #pongCanvas {
-            background-color: #000000; /* Svart bakgrunn for Pong */
-            border: 2px solid #e0e7ff; /* Lys kant */
-            border-radius: 0.5rem;
-        }
-        #pongGameControls {
-            margin-top: 1.5rem;
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        #pongGameControls button {
-            background-image: linear-gradient(to right, #dc2626, #ef4444); /* Rød gradient */
-            color: white;
-            border-radius: 0.5rem;
-            padding: 0.75rem 1.25rem;
-            font-weight: 600;
-            transition: all 0.2s ease-in-out;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-        #pongGameControls button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        }
-        #pongScore {
-            margin-top: 1rem;
-            font-size: 1.25rem;
-            font-weight: bold;
-            color: #e0e7ff;
-        }
-        #pongMessage {
-            color: #facc15; /* Gul for meldinger */
-            font-weight: 500;
-            margin-top: 0.5rem;
-        }
-        .pong-controls-info {
-            text-align: center;
-            margin-top: 1rem;
-            color: #9ca3af;
-            font-size: 0.9rem;
-        }
-
-
-        /* AI Chat spesifikke stiler */
-        #aiChatContainer { /* Ny container for å styre vis/skjul og layout */
-            grid-area: chat;
-            background-color: #2d3748; /* Mørkere grå for chat-bakgrunn */
-            padding: 1.5rem;
-            border-radius: 1rem;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            max-width: 500px; /* Maks bredde for pong */
+            aspect-ratio: 5 / 3; /* Pong aspect ratio */
         }
         
-        #aiChatContainer.hidden {
-            display: none;
+        /* Justering av elementer i Snake/Pong for å passe temaet */
+        /* Snake */
+        #snakeCanvas + #snakeGameControls button { margin-top: 1.5rem; }
+        #snakeScore { color: #00FFFF; text-shadow: 0 0 5px rgba(0, 255, 255, 0.5); }
+
+        /* Pong */
+        #pongCanvas + #pongGameControls button { margin-top: 1.5rem; }
+        #pongScore { color: #00FFFF; text-shadow: 0 0 5px rgba(0, 255, 255, 0.5); }
+        #pongMessage { color: #FFFF00; text-shadow: 0 0 5px rgba(255, 255, 0, 0.5); }
+        .pong-controls-info { color: #00FFFF; font-size: 0.85rem; }
+
+
+        /* Bunn-boks: Bruker Chat */
+        .bottom-box {
+            composes: retro-box; /* Arver fra retro-box */
         }
 
-        #chatOutput {
-            background-color: #1a202c; /* Enda mørkere for chat-historikk */
-            border-radius: 0.75rem;
+        #userChatOutput {
+            background-color: #0A0A0A; /* Mørkere bakgrunn for chat-output */
+            border: 1px solid #00FFFF;
+            color: #00FFFF;
             padding: 1rem;
-            min-height: 250px;
-            max-height: 400px;
+            min-height: 150px; /* Mindre chat-vindu som i bildet */
+            max-height: 250px; /* Liten, men scrollbar hvis mer innhold */
             overflow-y: auto;
             text-align: left;
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
-            color: #e2e8f0;
-            line-height: 1.5;
+            gap: 0.5rem;
+            line-height: 1.4;
+            border-radius: 0;
+            box-shadow: inset 0 0 5px rgba(0, 255, 255, 0.3);
         }
 
         .chat-message {
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.5rem;
-            max-width: 85%;
+            padding: 0.3rem 0.6rem;
+            border-radius: 0; /* Skarpe kanter */
+            max-width: 95%; /* Mindre marger */
+            word-break: break-word; /* Sikrer at lange ord brytes */
         }
 
-        .user-message {
-            background-color: #6366f1; /* Indigo for brukerens meldinger */
-            align-self: flex-end;
-            color: white;
-        }
-
-        .ai-message {
-            background-color: #4a5568; /* Mellomgrå for AI-meldinger */
+        .user-chat-message {
+            background-color: rgba(0, 150, 255, 0.2); /* Semi-transparent blå */
+            border-left: 3px solid #00FFFF; /* Marker venstre side */
             align-self: flex-start;
-            color: #e2e8f0;
+        }
+        .current-user-chat-message {
+            background-color: rgba(0, 255, 0, 0.1); /* Semi-transparent grønn for egen melding */
+            border-right: 3px solid #00FFFF; /* Marker høyre side */
+            align-self: flex-end;
+            text-align: right;
+        }
+        .chat-message span.font-bold {
+            color: #00FFFF;
+            text-shadow: 0 0 3px rgba(0, 255, 255, 0.5);
+        }
+        .chat-message span.text-xs {
+            color: #9CA3AF; /* Gråere for tid */
         }
 
-        #chatInputContainer {
+        #userChatInputContainer {
             display: flex;
             gap: 0.5rem;
+            margin-top: 1rem;
         }
 
-        #chatInput {
-            flex-grow: 1;
-            background-color: #6b7280;
-            color: #f3f4f6;
-            border-radius: 0.5rem;
-            padding: 0.75rem 1rem;
-            border: 1px solid #4b5563;
-            font-size: 1rem;
-        }
-        #chatInput:focus {
-            outline: none;
-            box-shadow: 0 0 0 2px #8b5cf6; /* Added focus ring */
-        }
-
-        #chatSendButton {
-            background-image: linear-gradient(to right, #059669, #10b981); /* Grønn gradient */
-            color: white;
-            border-radius: 0.5rem;
+        #userChatSendButton {
+            background-color: transparent;
+            border: 2px solid #00FFFF;
+            color: #00FFFF;
             padding: 0.75rem 1.25rem;
-            font-weight: 600;
-            transition: all 0.2s ease-in-out;
-            border: none;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
             cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            white-space: nowrap; /* Forhindrer wrapping */
+            transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+            border-radius: 0;
+            flex-shrink: 0; /* Hindrer krymping */
         }
-        #chatSendButton:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        #userChatSendButton:hover {
+            background-color: #00FFFF;
+            color: #000000;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.8), 0 0 20px rgba(0, 255, 255, 0.6);
         }
-        #chatSendButton:disabled {
-            background-image: linear-gradient(to right, #4a5568, #667eea);
-            cursor: not-allowed;
-            opacity: 0.7;
-            transform: none;
-            box-shadow: none;
+        #userChatSendButton:active {
+            background-color: #00BBBB;
+            box-shadow: 0 0 5px rgba(0, 255, 255, 0.8);
         }
 
-        #loadingIndicator {
-            color: #a78bfa;
+        #userChatLoadingIndicator {
+            color: #00FFFF;
             font-style: italic;
             margin-top: 0.5rem;
             text-align: center;
         }
 
+        #currentUserId {
+            color: #FFFF00; /* Gul for ID for å skille den ut */
+            text-shadow: 0 0 5px rgba(255, 255, 0, 0.5);
+        }
+
+        /* Skjul AI Chat i denne layouten for å matche bildet */
+        #aiChatContainer {
+            display: none !important;
+        }
 
         footer {
-            grid-area: footer;
             text-align: center;
             margin-top: 2rem;
             font-size: 0.875rem;
-            color: #9ca3af; /* Gråere tekst */
+            color: #9CA3AF; /* Gråere tekst for mindre viktig info */
         }
 
         /* Responsivitet for små skjermer */
-        @media (max-width: 1024px) { /* Endret breakpoint for layout */
-            .container {
-                grid-template-areas:
-                    "header"
-                    "menu"
-                    "game"
-                    "chat"
-                    "footer";
-                grid-template-columns: 1fr; /* Enkel kolonne på mindre skjermer */
-                padding: 1.5rem;
-                gap: 1.5rem;
+        @media (max-width: 640px) {
+            body {
+                padding: 0.5rem;
             }
-            h1 {
-                font-size: 2.25rem;
+            .main-wrapper {
+                gap: 1rem;
+                padding: 0.5rem;
             }
-            #guessTheNumberGame h2, #questionGame h2 {
-                font-size: 1.75rem;
-            }
-            .game-button, .retro-game-button {
-                width: 100%;
-                max-width: none;
-            }
-            #questionGame #questionDisplay {
-                font-size: 1.25rem;
-            }
-            #questionGame input[type="text"] {
-                max-width: 100%;
-            }
-            #snakeCanvas, #pongCanvas {
-                width: 100%;
-                height: auto; /* Justeres basert på aspect ratio */
-            }
-            #aiChatContainer { /* Bruk den nye container-ID-en */
+            .retro-box {
                 padding: 1rem;
             }
-            .chat-message {
-                max-width: 100%;
+            h1 {
+                font-size: 2rem;
+                margin-bottom: 1rem;
             }
-            #chatInputContainer {
+            .game-menu-retro {
+                gap: 1rem;
+            }
+            .retro-button {
+                width: 100%;
+                max-width: none;
+                padding: 0.6rem 1rem;
+            }
+            .game-area-retro p {
+                font-size: 1.2rem;
+            }
+            #userChatOutput {
+                min-height: 100px;
+            }
+            #userChatInputContainer {
                 flex-direction: column;
+                gap: 0.5rem;
             }
-            #chatSendButton {
+            #userChatSendButton {
                 width: 100%;
             }
+            #guessTheNumberGame input[type="number"],
+            #questionGame input[type="text"],
+            #userChatInput {
+                max-width: 100%;
+            }
+             #snakeCanvas, #pongCanvas {
+                width: 100%; /* Ensure canvas scales down */
+                height: auto; /* Maintain aspect ratio */
+             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Minispill for Tidsfordriv</h1>
-            <p class="text-gray-300">Finn ditt favorittspill for å slappe av og ha det gøy!</p>
-        </header>
+    <div class="main-wrapper">
+        <div class="top-box">
+            <h1>MINISPILL 1980s</h1>
+            <div class="game-menu-retro">
+                <button class="retro-button" onclick="loadGame('guessTheNumber')">Gjett Tallet</button>
+                <button class="retro-button" onclick="loadGame('pongGame')">Pong</button>
+                <button class="retro-button" onclick="loadGame('snakeGame')">Snake</button>
+            </div>
+        </div>
 
-        <nav class="game-menu">
-            <button class="game-button" onclick="loadGame('guessTheNumber')">Gjett Tallet</button>
-            <button class="game-button" onclick="loadGame('questionGame')">Spørsmålsspill</button>
-            <button class="game-button" onclick="loadGame('retroGames')">Retro Spill</button>
-            <button class="game-button" onclick="loadGame('aiChat')">AI Chat</button>
-            <button class="game-button" onclick="loadGame('anotherGame')" disabled>Et Annet Spill (kommer)</button>
-            <!-- Legg til flere spillknapper her -->
-        </nav>
-
-        <main class="game-area" id="gameArea">
+        <main class="game-area-retro" id="gameArea">
             <!-- Spillinnholdet vil lastes inn her via JavaScript -->
-            <p class="text-xl text-gray-400">Velg et spill fra menyen over for å begynne!</p>
+            <p>Velg et spill for å starte!</p>
         </main>
 
-        <!-- AI Chat er flyttet ut av gameArea for å være persistent -->
-        <div id="aiChatContainer" class="hidden">
-            <h2 class="text-2xl font-bold text-purple-400 mb-4 text-center">AI Chat</h2>
-            <div id="chatOutput" class="flex-grow overflow-y-auto mb-4">
-                <!-- Chat messages will appear here -->
+        <!-- Bruker Chat er nå den faste bunn-boksen -->
+        <div id="userChatContainer" class="bottom-box">
+            <h2 class="text-2xl font-bold text-center mb-4" style="color: #00FFFF; text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);">BRUKER CHAT</h2>
+            <div id="userChatOutput" class="flex-grow overflow-y-auto mb-4">
+                <!-- Bruker chat messages will appear here -->
             </div>
-            <p id="loadingIndicator" class="text-center italic text-purple-300 hidden">AI tenker...</p>
-            <div id="chatInputContainer" class="flex gap-2">
-                <input type="text" id="chatInput" placeholder="Skriv din melding her..." class="flex-grow">
-                <button id="chatSendButton" onclick="sendMessage()">Send</button>
+            <p id="userChatLoadingIndicator" class="text-center italic text-gray-400 hidden">Sender melding...</p>
+            <div id="userChatInputContainer" class="flex gap-2">
+                <input type="text" id="userChatInput" placeholder="SKRIV MELDING..." class="flex-grow">
+                <button id="userChatSendButton" onclick="sendMessageUserChat()">SEND</button>
             </div>
-            <button onclick="resetAIChat()" class="mt-4 bg-red-600 hover:bg-red-700 w-full rounded-md py-2 px-4 text-white font-semibold">Start Ny Samtale</button>
+            <div class="flex flex-wrap justify-between items-center mt-4 text-sm text-gray-400">
+                <span>DIN ID: <span id="currentUserId" class="font-mono text-white text-xs break-all">LASTER...</span></span>
+                <button onclick="clearUserChat()" class="retro-button px-3 py-1 text-sm">TØM CHAT</button>
+            </div>
         </div>
 
 
         <footer>
-            <p>&copy; 2025 Minispill. Alle rettigheter reservert.</p>
+            <p>&copy; 2025 MINISPILL ARCADE</p>
         </footer>
     </div>
+
+    <!-- Firebase SDK - IKKE ENDRE URL -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, orderBy, serverTimestamp, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Globala variabler (definieras av Canvas-miljön)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Firebase-initiering
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        let currentUserId = 'anonymous'; // Standardverdi
+
+        // Funktion för att hantera användarinloggning
+        async function authenticateFirebase() {
+            try {
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Firebase autentiseringsfel:", error);
+            }
+        }
+
+        // Lyssnare för autentiseringstillstånd
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUserId = user.uid;
+                // Update the ID display only if the element exists
+                const userIdDisplay = document.getElementById('currentUserId');
+                if (userIdDisplay) {
+                    userIdDisplay.textContent = currentUserId.substring(0, 8); // Show only first 8 chars for brevity
+                }
+                console.log("Firebase autentiserad. Användar-ID:", currentUserId);
+                setupUserChatListener(); // Starta chatt-lyssnaren först efter autentisering
+            } else {
+                currentUserId = 'anonymous'; // Fallback
+                const userIdDisplay = document.getElementById('currentUserId');
+                 if (userIdDisplay) {
+                    userIdDisplay.textContent = currentUserId + ' (ikke logget inn)';
+                }
+                console.log("Firebase: Ingen användare inloggad.");
+            }
+        });
+
+        // Exponera globalt för användning i script-taggen
+        window.db = db;
+        window.auth = auth;
+        window.currentUserId = currentUserId;
+        window.serverTimestamp = serverTimestamp;
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.query = query;
+        window.orderBy = orderBy;
+        window.onSnapshot = onSnapshot;
+        window.getDocs = getDocs; // Legg til getDocs
+        window.doc = doc; // Legg til doc
+        window.deleteDoc = deleteDoc; // Legg til deleteDoc
+
+        // Initialisera Firebase autentisering vid sidladdning
+        authenticateFirebase();
+
+    </script>
+
 
     <script>
         // Referanse til spillområdet
         const gameArea = document.getElementById('gameArea');
-        const aiChatContainer = document.getElementById('aiChatContainer'); // Referanse til den nye chat-containeren
+        const userChatContainer = document.getElementById('userChatContainer'); // Referanse til brukerchat-containeren
+        // AI Chat container er fjernet/skjult permanent i denne layouten.
 
         // requestAnimationFrame ID for Pong, so it can be cancelled
         let pongAnimationFrameId = null;
@@ -573,32 +497,29 @@
             gameArea.innerHTML = ''; // Tømmer spillområdet
             // Stopp alle aktive spill-looper før et nytt spill lastes
             stopAllGameLoops();
-            hideAIChatPanel(); // Skjul AI Chat når et nytt spill lastes
+
+            // Sørg for at spillområdet alltid er synlig i denne layouten
+            gameArea.classList.remove('hidden');
 
             switch (gameName) {
                 case 'guessTheNumber':
                     loadGuessTheNumberGame();
                     break;
-                case 'questionGame':
+                case 'questionGame': // Denne knappen er nå fjernet fra main menu
                     loadQuestionGame();
                     break;
-                case 'retroGames':
+                case 'retroGames': // Denne knappen er nå fjernet fra main menu
                     loadRetroGamesMenu();
                     break;
-                case 'snakeGame': // Spesifikt for Snake, lastes fra retroGames menu
+                case 'snakeGame':
                     loadSnakeGame();
                     break;
-                case 'pongGame': // Spesifikt for Pong, lastes fra retroGames menu
+                case 'pongGame':
                     loadPongGame();
                     break;
-                case 'aiChat':
-                    showAIChatPanel(); // Vis AI Chat når den velges
-                    break;
-                case 'anotherGame':
-                    gameArea.innerHTML = '<h2 class="text-2xl text-yellow-400">Dette spillet kommer snart!</h2><p class="mt-2 text-gray-300">Følg med for mer moro.</p>';
-                    break;
+                // AI Chat og Bruker Chat er nå faste elementer, ikke lastet inn i gameArea
                 default:
-                    gameArea.innerHTML = '<p class="text-xl text-red-500">Ukjent spill.</p>';
+                    gameArea.innerHTML = '<p>Ukjent spill. Velg fra menyen.</p>';
             }
         }
 
@@ -614,32 +535,31 @@
                 cancelAnimationFrame(pongAnimationFrameId);
                 pongAnimationFrameId = null;
             }
-            // Legg til andre spill-looper her hvis de bruker requestAnimationFrame eller setInterval/setTimeout
-            document.removeEventListener('keydown', changeDirection); // Fjern snake controls
-            document.removeEventListener('keydown', handlePongKeyPress); // Fjern pong controls
-            document.removeEventListener('keyup', handlePongKeyRelease); // Fjern pong controls
+            // Fjern event listeners for spillkontroller
+            document.removeEventListener('keydown', changeDirection);
+            document.removeEventListener('keydown', handlePongKeyPress);
+            document.removeEventListener('keyup', handlePongKeyRelease);
         }
 
 
         // --- Gjett Tallet-spillet ---
         function loadGuessTheNumberGame() {
             gameArea.innerHTML = `
-                <div id="guessTheNumberGame" class="w-full max-w-md bg-gray-700 p-8 rounded-xl shadow-lg">
-                    <h2 class="mb-6">Gjett Tallet!</h2>
-                    <p class="text-lg mb-4">Jeg tenker på et tall mellom 1 og 100.</p>
-                    <input type="number" id="guessInput" placeholder="Skriv inn ditt gjetning" min="1" max="100" class="focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <button onclick="checkGuess()" class="mt-4 w-full">Gjett!</button>
+                <div id="guessTheNumberGame" class="w-full max-w-md p-4 flex flex-col items-center">
+                    <h2>GJETT TALLET!</h2>
+                    <p class="text-lg mb-4 mt-4">JEG TENKER PÅ ET TALL MELLOM 1 OG 100.</p>
+                    <input type="number" id="guessInput" placeholder="SKRIV INN DITT GJETNING" min="1" max="100" class="w-full max-w-xs">
+                    <button onclick="checkGuess()" class="mt-4 w-full max-w-xs">GJETT!</button>
                     <p id="gameMessage" class="text-gray-200 mt-4"></p>
                     <p id="attemptsCount" class="text-gray-400"></p>
-                    <button onclick="resetGuessTheNumberGame()" class="mt-6 bg-red-600 hover:bg-red-700 w-full">Start Nytt Spill</button>
+                    <button onclick="resetGuessTheNumberGame()" class="mt-6 w-full max-w-xs">START NYTT SPILL</button>
                 </div>
             `;
 
-            // Initialiser spillvariabler for "Gjett Tallet"
             secretNumber = generateRandomNumber(1, 100);
             attempts = 0;
             updateGuessTheNumberUI();
-            console.log("Secret number (for testing):", secretNumber); // Fjern denne i et ekte spill!
+            console.log("Secret number (for testing):", secretNumber);
         }
 
         let secretNumber;
@@ -650,7 +570,7 @@
         }
 
         function updateGuessTheNumberUI() {
-            document.getElementById('attemptsCount').textContent = `Antall forsøk: ${attempts}`;
+            document.getElementById('attemptsCount').textContent = `ANTALL FORSØK: ${attempts}`;
         }
 
         function checkGuess() {
@@ -659,8 +579,8 @@
             const guess = parseInt(guessInput.value);
 
             if (isNaN(guess) || guess < 1 || guess > 100) {
-                gameMessage.textContent = "Vennligst skriv inn et gyldig tall mellom 1 og 100.";
-                gameMessage.style.color = '#f87171'; /* rød */
+                gameMessage.textContent = "VENNLIGST SKRIV INN ET GYLDIG TALL MELLOM 1 OG 100.";
+                gameMessage.style.color = '#FF00FF'; /* Magenta for feil */
                 return;
             }
 
@@ -668,19 +588,19 @@
             updateGuessTheNumberUI();
 
             if (guess === secretNumber) {
-                gameMessage.textContent = `Gratulerer! Du gjettet riktig tall (${secretNumber}) på ${attempts} forsøk!`;
-                gameMessage.style.color = '#34d399'; /* grønn */
-                guessInput.disabled = true; // Deaktiver input etter vinner
+                gameMessage.textContent = `GRATULERER! DU GJETTET RIKTIG TALL (${secretNumber}) PÅ ${attempts} FORSØK!`;
+                gameMessage.style.color = '#00FF00'; /* Grønn for riktig */
+                guessInput.disabled = true;
             } else if (guess < secretNumber) {
-                gameMessage.textContent = "For lavt! Prøv et høyere tall.";
-                gameMessage.style.color = '#facc15'; /* gul */
+                gameMessage.textContent = "FOR LAVT! PRØV ET HØYERE TALL.";
+                gameMessage.style.color = '#FFFF00'; /* Gul for hint */
             } else {
-                gameMessage.textContent = "For høyt! Prøv et lavere tall.";
-                gameMessage.style.color = '#facc15'; /* gul */
+                gameMessage.textContent = "FOR HØYT! PRØV ET LAVERE TALL.";
+                gameMessage.style.color = '#FFFF00'; /* Gul for hint */
             }
 
-            guessInput.value = ''; // Tøm inputfeltet
-            guessInput.focus(); // Sett fokus tilbake til inputfeltet
+            guessInput.value = '';
+            guessInput.focus();
         }
 
         function resetGuessTheNumberGame() {
@@ -690,150 +610,109 @@
             document.getElementById('guessInput').disabled = false;
             document.getElementById('gameMessage').textContent = '';
             updateGuessTheNumberUI();
-            console.log("Secret number (for testing):", secretNumber); // Fjern denne i et ekte spill!
+            console.log("Secret number (for testing):", secretNumber);
         }
 
-        // --- Spørsmålsspillet ---
+        // --- Spørsmålsspillet (Ikke lenger i meny, men beholdt funksjonalitet) ---
         let questions = [];
         let currentQuestionIndex;
         let correctAnswers = 0;
         let totalQuestionsAsked = 0;
-        const LEADERBOARD_KEY = 'questionGameLeaderboard'; // Nøkkel for localStorage
+        const LEADERBOARD_KEY = 'questionGameLeaderboard';
 
-        // Shuffle function (Fisher-Yates)
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+                [array[i], array[j]] = [array[j], array[i]];
             }
         }
 
         function loadQuestionGame() {
             gameArea.innerHTML = `
-                <div id="questionGame" class="w-full max-w-lg bg-gray-700 p-8 rounded-xl shadow-lg flex flex-col items-center">
-                    <h2 class="mb-6">Spørsmålsspill!</h2>
-                    <p id="questionDisplay" class="mb-4"></p>
-                    <input type="text" id="answerInput" placeholder="Skriv inn ditt svar her" class="focus:outline-none focus:ring-2 focus:ring-yellow-500">
-                    <div class="button-group flex justify-center mt-4">
-                        <button onclick="checkQuestionAnswer()">Svar</button>
-                        <button onclick="nextQuestion()" class="bg-gray-600 hover:bg-gray-500">Neste Spørsmål</button>
+                <div id="questionGame" class="w-full max-w-lg p-4 flex flex-col items-center">
+                    <h2>SPØRSMÅLSSPILL!</h2>
+                    <p id="questionDisplay" class="mb-4 mt-4"></p>
+                    <input type="text" id="answerInput" placeholder="SKRIV INN DITT SVAR HER" class="w-full max-w-md">
+                    <div class="button-group flex justify-center mt-4 gap-4">
+                        <button onclick="checkQuestionAnswer()">SVAR</button>
+                        <button onclick="nextQuestion()">NESTE SPØRSMÅL</button>
                     </div>
                     <p id="answerMessage" class="text-gray-200 mt-4"></p>
-                    <p id="scoreDisplay" class="text-gray-400 mt-2">Poeng: 0 / 0</p>
-                    <button onclick="resetQuestionGame()" class="mt-6 bg-red-600 hover:bg-red-700 w-full">Start Nytt Spill</button>
+                    <p id="scoreDisplay" class="text-gray-400 mt-2">POENG: 0 / 0</p>
+                    <button onclick="resetQuestionGame()" class="mt-6 w-full max-w-xs">START NYTT SPILL</button>
                 </div>
 
-                <div id="leaderboard-container" class="mt-8">
-                    <h3>Resultatliste</h3>
-                    <ol id="leaderboardList"></ol>
+                <div id="leaderboard-container" class="mt-8 retro-box w-full max-w-md">
+                    <h3 class="text-xl font-bold text-center" style="color: #00FFFF; text-shadow: 0 0 5px rgba(0, 255, 255, 0.6);">RESULTATLISTE</h3>
+                    <ol id="leaderboardList" class="mt-4"></ol>
                 </div>
             `;
 
             initializeQuestionGame();
-            loadAndDisplayLeaderboard(); // Last og vis resultatliste ved oppstart
+            loadAndDisplayLeaderboard();
         }
 
         function initializeQuestionGame() {
-            // Definer en stor spørsmålsbase
             const allQuestions = [
-                { question: "Hva er hovedstaden i Norge?", answer: "Oslo" },
-                { question: "Hvilket grunnstoff har kjemisk symbol 'O'?", answer: "Oksygen" },
-                { question: "Hva heter verdens største hav?", answer: "Stillehavet" },
-                { question: "Hvilken planet er kjent som 'Den røde planet'?", answer: "Mars" },
-                { question: "Hvem skrev 'Peer Gynt'?", answer: "Henrik Ibsen" },
-                { question: "Hvor mange dager er det i et skuddår?", answer: "366" },
-                { question: "Hva er resultatet av 7 x 8?", answer: "56" },
-                { question: "Hvilken fugl er et symbol for fred?", answer: "Due" },
-                { question: "Hva heter den høyeste fjelltoppen i verden?", answer: "Mount Everest" },
-                { question: "Hvilket dyr gir oss ull?", answer: "Sau" },
-                { question: "Hva heter Norges lengste elv?", answer: "Glomma" },
-                { question: "Hvilken farge får du hvis du blander blått og gult?", answer: "Grønn" },
-                { question: "Hva heter det største organet i menneskekroppen?", answer: "Hud" },
-                { question: "Hva heter valutaen i Japan?", answer: "Yen" },
-                { question: "Hvilken sport bruker en puck?", answer: "Ishockey" },
-                { question: "Hva er hovedstaden i Sverige?", answer: "Stockholm" },
-                { question: "Hvilken måned har 28 dager (utenom skuddår)?", answer: "Februar" },
-                { question: "Hva heter dyret som er en 'kongle-spiser'?", answer: "Eikenøtt" },
-                { question: "Hva er motsatt av 'kald'?", answer: "Varm" },
-                { question: "Hvilken by er kjent for Eiffeltårnet?", answer: "Paris" },
-                { question: "Hva heter havnen i Bergen?", answer: "Bryggen" },
-                { question: "Hvilket instrument har 88 tangenter?", answer: "Piano" },
-                { question: "Hva er et annet navn for et 'sekskantet' objekt?", answer: "Heksagon" },
-                { question: "Hvilken type frukt er en banan?", answer: "Bær" },
-                { question: "Hva er den største ørkenen i verden?", answer: "Sahara" },
-                { question: "Hvem malte 'Skrik'?", answer: "Edvard Munch" },
-                { question: "Hva heter Norges nasjonalfugl?", answer: "Fossekall" },
-                { question: "Hvor mange bein har en edderkopp?", answer: "8" },
-                { question: "Hva er den offisielle hovedstaden i Canada?", answer: "Ottawa" },
-                { question: "Hvilket hav skiller Europa og Afrika?", answer: "Middelhavet" },
-                { question: "Hva heter fiktive karakteren som bor i en ananas under havet?", answer: "Svampebob Firkant" },
-                { question: "Hva er det høyeste bygget i verden?", answer: "Burj Khalifa" },
-                { question: "Hvilken farge er solsikker?", answer: "Gul" },
-                { question: "Hva heter det første mennesket på månen?", answer: "Neil Armstrong" },
-                { question: "Hvilket land er kjent for pizza og pasta?", answer: "Italia" },
-                { question: "Hva er en gruppe løver kalt?", answer: "Stolthet" },
-                { question: "Hvilken metall er flytende ved romtemperatur?", answer: "Kvikksølv" },
-                { question: "Hva er hovedstaden i Tyskland?", answer: "Berlin" },
-                { question: "Hva heter det største pattedyr i verden?", answer: "Blåhval" },
-                { question: "Hva er det mest vanlige navnet i verden?", answer: "Mohammed" },
-                { question: "Hva heter elven som renner gjennom London?", answer: "Themsen" },
-                { question: "Hva er det minste landet i verden?", answer: "Vatikanstaten" },
-                { question: "Hva heter den største øya i verden?", answer: "Grønland" },
-                { question: "Hva er hovedingrediensen i guacamole?", answer: "Avocado" },
-                { question: "Hvilken planet er nærmest solen?", answer: "Mercur" },
-                { question: "Hva er det kjemiske symbolet for vann?", answer: "H2O" },
-                { question: "Hvilken farge er himmelen på en klar dag?", answer: "Blå" },
-                { question: "Hvilket dyr er kjent for å bygge demninger?", answer: "Bever" },
-                { question: "Hva heter sporten der man kaster en javelin?", answer: "Spydkast" },
-                { question: "Hvilken del av et tre leder vann opp til bladene?", answer: "Stamme" }
+                { question: "HVA ER HOVEDSTADEN I NORGE?", answer: "Oslo" },
+                { question: "HVILKET GRUNNSTOFF HAR KJEMISK SYMBOL 'O'?", answer: "Oksygen" },
+                { question: "HVA HETER VERDENS STØRSTE HAV?", answer: "Stillehavet" },
+                { question: "HVILKEN PLANET ER KJENT SOM 'DEN RØDE PLANET'?", answer: "Mars" },
+                { question: "HVEM SKREV 'PEER GYNT'?", answer: "Henrik Ibsen" },
+                { question: "HVOR MANGE DAGER ER DET I ET SKUDDÅR?", answer: "366" },
+                { question: "HVA ER RESULTATET AV 7 X 8?", answer: "56" },
+                { question: "HVILKEN FUGL ER ET SYMBOL FOR FRED?", answer: "Due" },
+                { question: "HVA HETER DEN HØYESTE FJELLTOPPEN I VERDEN?", answer: "Mount Everest" },
+                { question: "HVILKET DYR GIR OSS ULL?", answer: "Sau" },
+                { question: "HVA HETER NORGES LENGSTE ELV?", answer: "Glomma" },
+                { question: "HVILKEN FARGE FÅR DU HVIS DU BLANDER BLÅTT OG GULT?", answer: "Grønn" },
+                { question: "HVA HETER DET STØRSTE ORGANET I MENNESKEKROPPEN?", answer: "Hud" },
+                { question: "HVA HETER VALUTAEN I JAPAN?", answer: "Yen" },
+                { question: "HVILKEN SPORT BRUKER EN PUCK?", answer: "Ishockey" },
+                { question: "HVA ER HOVEDSTADEN I SVERIGE?", answer: "Stockholm" },
+                { question: "HVILKEN MÅNED HAR 28 DAGER (UTENOM SKUDDÅR)?", answer: "Februar" },
+                { question: "HVA HETER DYRET SOM ER EN 'KONGLE-SPISER'?", answer: "Eikenøtt" },
+                { question: "HVA ER MOTSATT AV 'KALD'?", answer: "Varm" },
+                { question: "HVILKEN BY ER KJENT FOR EIFFELTÅRNET?", answer: "Paris" },
+                { question: "HVA HETER HAVNEN I BERGEN?", answer: "Bryggen" },
+                { question: "HVILKET INSTRUMENT HAR 88 TANGENTER?", answer: "Piano" },
+                { question: "HVA ER ET ANNET NAVN FOR ET 'SEKSKANTET' OBJEKT?", answer: "Heksagon" },
+                { question: "HVILKEN TYPE FRUKT ER EN BANAN?", answer: "Bær" },
+                { question: "HVA ER DEN STØRSTE ØRKENEN I VERDEN?", answer: "Sahara" },
+                { question: "HVEM MALTE 'SKRIK'?", answer: "Edvard Munch" },
+                { question: "HVA HETER NORGES NASJONALFUGL?", answer: "Fossekall" },
+                { question: "HVOR MANGE BEIN HAR EN EDDERKOPP?", answer: "8" },
+                { question: "HVA ER DEN OFFISIELLE HOVEDSTADEN I CANADA?", answer: "Ottawa" },
+                { question: "HVILKET HAV SKILLER EUROPA OG AFRIKA?", answer: "Middelhavet" },
+                { question: "HVA HETER FIKTIVE KARAKTEREN SOM BOR I EN ANANAS UNDER HAVET?", answer: "Svampebob Firkant" },
+                { question: "HVA ER DET HØYESTE BYGGET I VERDEN?", answer: "Burj Khalifa" },
+                { question: "HVILKEN FARGE ER SOLSIKKER?", answer: "Gul" },
+                { question: "HVA HETER DET FØRSTE MENNESKET PÅ MÅNEN?", answer: "Neil Armstrong" },
+                { question: "HVILKET LAND ER KJENT FOR PIZZA OG PASTA?", answer: "Italia" },
+                { question: "HVA ER EN GRUPPE LØVER KALT?", answer: "Stolthet" },
+                { question: "HVILKEN METALL ER FLYTENDE VED ROMTEMPERATUR?", answer: "Kvikksølv" },
+                { question: "HVA ER HOVEDSTADEN I TYSKLAND?", answer: "Berlin" },
+                { question: "HVA HETER DET STØRSTE PATTEDYR I VERDEN?", answer: "Blåhval" },
+                { question: "HVA ER DET MEST VANLIGE NAVNET I VERDEN?", answer: "Mohammed" },
+                { question: "HVA HETER ELVEN SOM RENNER GJENNOM LONDON?", answer: "Themsen" },
+                { question: "HVA ER DET MINSTE LANDET I VERDEN?", answer: "Vatikanstaten" },
+                { question: "HVA HETER DEN STØRSTE ØYA I VERDEN?", answer: "Grønland" },
+                { question: "HVA ER HOVEDINGREDIENSEN I GUACAMOLE?", answer: "Avocado" },
+                { question: "HVILKEN PLANET ER NÆRMEST SOLEN?", answer: "Mercur" },
+                { question: "HVA ER DET KJEMISKE SYMBOLET FOR VANN?", answer: "H2O" },
+                { question: "HVILKEN FARGE ER HIMMELEN PÅ EN KLAR DAG?", answer: "Blå" },
+                { question: "HVILKET DYR ER KJENT FOR Å BYGGE DEMNINGER?", answer: "Bever" },
+                { question: "HVA HETER SPORTEN DER MAN KASTER EN JAVELIN?", answer: "Spydkast" },
+                { question: "HVILKEN DEL AV ET TRE LEDER VANN OPP TIL BLADENE?", answer: "Stamme" }
             ];
 
-            questions = [...allQuestions]; // Lag en kopi
+            questions = [...allQuestions];
             shuffleArray(questions);
-            currentQuestionIndex = -1; // Start før første spørsmål
+            currentQuestionIndex = -1;
             correctAnswers = 0;
             totalQuestionsAsked = 0;
-            nextQuestion(); // Last inn det første spørsmålet
+            nextQuestion();
             updateQuestionScore();
-        }
-
-        function displayQuestion() {
-            const questionDisplay = document.getElementById('questionDisplay');
-            const answerInput = document.getElementById('answerInput');
-            const answerMessage = document.getElementById('answerMessage');
-
-            // Skjul eventuell input for kallenavn
-            const nicknameInputContainer = document.getElementById('nicknameInputContainer');
-            if (nicknameInputContainer) {
-                nicknameInputContainer.remove();
-            }
-
-            if (currentQuestionIndex < questions.length) {
-                questionDisplay.textContent = questions[currentQuestionIndex].question;
-                answerInput.value = '';
-                answerInput.disabled = false;
-                answerMessage.textContent = '';
-                answerInput.focus();
-            } else {
-                // Spill slutt
-                questionDisplay.textContent = `Spillet er ferdig! Du svarte riktig på ${correctAnswers} av ${totalQuestionsAsked} spørsmål.`;
-                answerInput.disabled = true;
-                answerMessage.textContent = '';
-
-                // Sjekk om poengsummen er god nok for resultatlisten
-                loadAndDisplayLeaderboard(); // Last for å få siste liste
-                const currentLeaderboard = getLeaderboard();
-                const lowestScoreOnLeaderboard = currentLeaderboard.length < 5 ? -1 : currentLeaderboard[currentLeaderboard.length - 1].score;
-
-                if (correctAnswers > lowestScoreOnLeaderboard) {
-                    showNicknameInput();
-                } else {
-                    setTimeout(() => {
-                        answerMessage.textContent = "Prøv igjen for å komme på resultatlisten!";
-                        answerMessage.style.color = '#facc15'; // Gul
-                    }, 1000);
-                }
-            }
         }
 
         function checkQuestionAnswer() {
@@ -842,22 +721,21 @@
             const userAnswer = answerInput.value.trim().toLowerCase();
             const correctAnswer = questions[currentQuestionIndex].answer.trim().toLowerCase();
 
-            // Sjekk om svar allerede er gitt for dette spørsmålet
             if (answerInput.disabled) {
                 return;
             }
 
-            totalQuestionsAsked++; // Teller antall spørsmål besvart
+            totalQuestionsAsked++;
 
             if (userAnswer === correctAnswer) {
-                answerMessage.textContent = "Riktig svar! 🎉";
-                answerMessage.style.color = '#34d399'; /* grønn */
+                answerMessage.textContent = "RIKTIG SVAR! 🎉";
+                answerMessage.style.color = '#00FF00'; /* Grønn */
                 correctAnswers++;
             } else {
-                answerMessage.textContent = `Feil svar. Svaret var: ${questions[currentQuestionIndex].answer}`;
-                answerMessage.style.color = '#f87171'; /* rød */
+                answerMessage.textContent = `FEIL SVAR. SVARET VAR: ${questions[currentQuestionIndex].answer.toUpperCase()}`;
+                answerMessage.style.color = '#FF00FF'; /* Magenta */
             }
-            answerInput.disabled = true; // Deaktiver input etter svar
+            answerInput.disabled = true;
             updateQuestionScore();
         }
 
@@ -865,11 +743,10 @@
             const answerMessage = document.getElementById('answerMessage');
             const answerInput = document.getElementById('answerInput');
 
-            // Hvis spørsmål ikke er svart på, tell det som feil
             if (currentQuestionIndex >= 0 && !answerInput.disabled && currentQuestionIndex < questions.length) {
                  totalQuestionsAsked++;
-                 answerMessage.textContent = `Du hoppet over dette. Svaret var: ${questions[currentQuestionIndex].answer}`;
-                 answerMessage.style.color = '#facc15'; /* gul */
+                 answerMessage.textContent = `DU HOPPET OVER DETTE. SVARET VAR: ${questions[currentQuestionIndex].answer.toUpperCase()}`;
+                 answerMessage.style.color = '#FFFF00'; /* Gul */
                  updateQuestionScore();
             }
 
@@ -878,7 +755,7 @@
         }
 
         function updateQuestionScore() {
-            document.getElementById('scoreDisplay').textContent = `Poeng: ${correctAnswers} / ${totalQuestionsAsked}`;
+            document.getElementById('scoreDisplay').textContent = `POENG: ${correctAnswers} / ${totalQuestionsAsked}`;
         }
 
         function resetQuestionGame() {
@@ -900,37 +777,36 @@
             let leaderboard = getLeaderboard();
             leaderboard.push({ nickname: nickname, score: score, totalQuestions: total });
 
-            // Sorter etter poeng (synkende), deretter etter totalt antall spørsmål (stigende for å bryte bånd)
             leaderboard.sort((a, b) => {
                 if (b.score !== a.score) {
                     return b.score - a.score;
                 }
-                return a.totalQuestions - b.totalQuestions; // Færre spørsmål for samme score vinner
+                return a.totalQuestions - b.totalQuestions;
             });
 
-            // Behold kun de 5 beste
             leaderboard = leaderboard.slice(0, 5);
             saveLeaderboard(leaderboard);
-            loadAndDisplayLeaderboard(); // Oppdater visningen
+            loadAndDisplayLeaderboard();
         }
 
         function loadAndDisplayLeaderboard() {
             const leaderboardList = document.getElementById('leaderboardList');
-            if (!leaderboardList) return; // Sjekk om elementet eksisterer
+            if (!leaderboardList) return;
 
             const leaderboard = getLeaderboard();
-            leaderboardList.innerHTML = ''; // Tømmer listen
+            leaderboardList.innerHTML = '';
 
             if (leaderboard.length === 0) {
-                leaderboardList.innerHTML = '<li class="text-center text-gray-400">Ingen resultater ennå. Spill for å komme på listen!</li>';
+                leaderboardList.innerHTML = '<li class="text-center text-gray-400">INGEN RESULTATER ENNÅ. SPILL FOR Å KOMME PÅ LISTEN!</li>';
                 return;
             }
 
             leaderboard.forEach((entry, index) => {
                 const listItem = document.createElement('li');
+                listItem.className = "flex justify-between items-center bg-transparent border-b border-dashed border-gray-700 py-1";
                 listItem.innerHTML = `
-                    <span>${index + 1}. ${entry.nickname}</span>
-                    <span class="leaderboard-score">${entry.score} / ${entry.totalQuestions}</span>
+                    <span class="text-cyan-400">${index + 1}. ${entry.nickname.toUpperCase()}</span>
+                    <span class="text-yellow-400">${entry.score} / ${entry.totalQuestions}</span>
                 `;
                 leaderboardList.appendChild(listItem);
             });
@@ -940,11 +816,11 @@
             const questionGameDiv = document.getElementById('questionGame');
             const nicknameInputContainer = document.createElement('div');
             nicknameInputContainer.id = 'nicknameInputContainer';
-            nicknameInputContainer.className = 'mt-6 bg-gray-600 p-4 rounded-lg shadow-md w-full max-w-md'; // Mindre enn spillets div
+            nicknameInputContainer.className = 'mt-6 retro-box w-full max-w-md p-4';
             nicknameInputContainer.innerHTML = `
-                <p class="text-white mb-2">Gratulerer! Skriv inn ditt kallenavn for resultatlisten:</p>
-                <input type="text" id="nicknameInput" placeholder="Kallenavn" class="w-full mb-2">
-                <button onclick="submitNickname()" class="w-full">Lagre Poengsum</button>
+                <p class="text-center mb-2">GRATULERER! SKRIV INN DITT KALLENAVN FOR RESULTATLISTEN:</p>
+                <input type="text" id="nicknameInput" placeholder="KALLENAVN" class="w-full mb-2">
+                <button onclick="submitNickname()" class="w-full">LAGRE POENGSUM</button>
             `;
             questionGameDiv.appendChild(nicknameInputContainer);
             document.getElementById('nicknameInput').focus();
@@ -955,83 +831,85 @@
             let nickname = nicknameInput.value.trim();
 
             if (nickname === "") {
-                nickname = "Anonym"; // Standard kallenavn hvis tom
+                nickname = "ANONYM";
             }
 
             addScoreToLeaderboard(nickname, correctAnswers, totalQuestionsAsked);
 
-            // Fjern kallenavninput og gi tilbakemelding
             const nicknameInputContainer = document.getElementById('nicknameInputContainer');
             if (nicknameInputContainer) {
                 nicknameInputContainer.remove();
             }
             const answerMessage = document.getElementById('answerMessage');
-            answerMessage.textContent = `Poengsum lagret under ${nickname}!`;
-            answerMessage.style.color = '#34d399'; // Grønn
+            answerMessage.textContent = `POENGSUM LAGRET UNDER ${nickname.toUpperCase()}!`;
+            answerMessage.style.color = '#00FF00';
         }
 
-        // --- Retro Games Menu ---
+        // --- Retro Games Menu (Ikke lenger i meny, men beholdt funksjonalitet) ---
         function loadRetroGamesMenu() {
             gameArea.innerHTML = `
-                <div class="retro-game-menu w-full max-w-2xl">
-                    <h2 class="text-3xl font-bold text-blue-300 mb-6 w-full text-center">90-talls Retro Spill</h2>
-                    <button class="retro-game-button" onclick="loadGame('snakeGame')">Snake</button>
-                    <button class="retro-game-button" onclick="loadGame('pongGame')">Pong</button>
-                    <button class="retro-game-button" disabled>Tetris Lite (kommer)</button>
-                    <button class="retro-game-button" disabled>Pac-Man Lite (kommer)</button>
-                    <button class="retro-game-button" disabled>Space Invaders Lite (kommer)</button>
-                    <button class="retro-game-button" disabled>Brick Breaker (kommer)</button>
-                    <button class="retro-game-button" disabled>Frogger Lite (kommer)</button>
-                    <button class="retro-game-button" disabled>Connect Four (kommer)</button>
-                    <button class="retro-game-button" disabled>Tic-Tac-Toe (kommer)</button>
-                    <button class="retro-game-button" disabled>Minesweeper Lite (kommer)</button>
-                    <button class="retro-game-button" disabled>Simon Says (kommer)</button>
-                    <button class="retro-game-button" disabled>Whack-A-Mole (kommer)</button>
-                    <button class="retro-game-button" disabled>Flappy Bird (kommer)</button>
-                    <button class="retro-game-button" disabled>Crossy Road (kommer)</button>
-                    <button class="retro-game-button" disabled>Endless Runner (kommer)</button>
-                    <button class="retro-game-button" disabled>Pinball Lite (kommer)</button>
-                    <button class="retro-game-button" disabled>Hangman (kommer)</button>
-                    <button class="retro-game-button" disabled>Guess the Word (kommer)</button>
-                    <button class="retro-game-button" disabled>Rock-Paper-Scissors (kommer)</button>
-                    <button class="retro-game-button" disabled>Memory Game (kommer)</button>
-                    <button class="retro-game-button" disabled>Sudoku (kommer)</button>
-                    <button class="retro-game-button" disabled>Battleship Lite (kommer)</button>
-                    <button class="retro-game-button" disabled>Mastermind (kommer)</button>
-                    <button class="retro-game-button" disabled>2048 (kommer)</button>
-                    <button class="retro-game-button" disabled>Doodle Jump (kommer)</button>
+                <div class="w-full max-w-2xl p-4">
+                    <h2 class="text-3xl font-bold text-center mb-6">90-TALLS RETRO SPILL</h2>
+                    <div class="game-menu-retro">
+                        <button class="retro-button" onclick="loadGame('snakeGame')">SNAKE</button>
+                        <button class="retro-button" onclick="loadGame('pongGame')">PONG</button>
+                        <button class="retro-button" disabled>TETRIS LITE (KOMMER)</button>
+                        <button class="retro-button" disabled>PAC-MAN LITE (KOMMER)</button>
+                        <button class="retro-button" disabled>SPACE INVADERS LITE (KOMMER)</button>
+                        <button class="retro-button" disabled>BRICK BREAKER (KOMMER)</button>
+                        <button class="retro-button" disabled>FROGGER LITE (KOMMER)</button>
+                        <button class="retro-button" disabled>CONNECT FOUR (KOMMER)</button>
+                        <button class="retro-button" disabled>TIC-TAC-TOE (KOMMER)</button>
+                        <button class="retro-button" disabled>MINESWEEPER LITE (KOMMER)</button>
+                        <button class="retro-button" disabled>SIMON SAYS (KOMMER)</button>
+                        <button class="retro-button" disabled>WHACK-A-MOLE (KOMMER)</button>
+                        <button class="retro-button" disabled>FLAPPY BIRD (KOMMER)</button>
+                        <button class="retro-button" disabled>CROSSY ROAD (KOMMER)</button>
+                        <button class="retro-button" disabled>ENDLESS RUNNER (KOMMER)</button>
+                        <button class="retro-button" disabled>PINBALL LITE (KOMMER)</button>
+                        <button class="retro-button" disabled>HANGMAN (KOMMER)</button>
+                        <button class="retro-button" disabled>GUESS THE WORD (KOMMER)</button>
+                        <button class="retro-button" disabled>ROCK-PAPER-SCISSORS (KOMMER)</button>
+                        <button class="retro-button" disabled>MEMORY GAME (KOMMER)</button>
+                        <button class="retro-button" disabled>SUDOKU (KOMMER)</button>
+                        <button class="retro-button" disabled>BATTLESHIP LITE (KOMMER)</button>
+                        <button class="retro-button" disabled>MASTERMIND (KOMMER)</button>
+                        <button class="retro-button" disabled>2048 (KOMMER)</button>
+                        <button class="retro-button" disabled>DOODLE JUMP (KOMMER)</button>
+                    </div>
                 </div>
             `;
         }
 
+
         // --- Snake Game ---
         let snakeCanvas, snakeCtx;
-        const GRID_SIZE = 20; // Størrelse på hver rute i rutenettet
+        const GRID_SIZE = 20;
         let snake = [{ x: 10, y: 10 }];
         let food = {};
-        let dx = 0; // x hastighet
-        let dy = 0; // y hastighet
+        let dx = 0;
+        let dy = 0;
         let score = 0;
         let changingDirection = false;
-        let snakeGameLoopId = null; // Lagrer setTimeout ID for pausing/resetting
+        let snakeGameLoopId = null;
 
         function loadSnakeGame() {
             gameArea.innerHTML = `
-                <div id="snakeGame" class="w-full max-w-lg bg-gray-800 p-6 rounded-xl shadow-lg flex flex-col items-center">
-                    <h2 class="text-2xl font-bold text-blue-400 mb-4">Snake</h2>
+                <div id="snakeGame" class="w-full max-w-lg p-4 flex flex-col items-center">
+                    <h2>SNAKE</h2>
                     <canvas id="snakeCanvas" width="400" height="400"></canvas>
-                    <div id="snakeGameControls" class="mt-4">
-                        <button onclick="startGame()">Start Spill</button>
-                        <button onclick="pauseGame()">Pause/Fortsett</button>
-                        <button onclick="resetSnakeGame()">Nytt Spill</button>
+                    <div id="snakeGameControls" class="mt-4 flex gap-4">
+                        <button onclick="startGame()">START SPILL</button>
+                        <button onclick="pauseGame()">PAUSE/FORTSETT</button>
+                        <button onclick="resetSnakeGame()">NYTT SPILL</button>
                     </div>
-                    <p id="snakeScore" class="mt-4">Poeng: 0</p>
+                    <p id="snakeScore" class="mt-4">POENG: 0</p>
                 </div>
             `;
             snakeCanvas = document.getElementById('snakeCanvas');
             snakeCtx = snakeCanvas.getContext('2d');
-            resetSnakeGame(); // Initialiser spilltilstand
-            document.addEventListener('keydown', changeDirection); // Lytt etter piltaster
+            resetSnakeGame();
+            document.addEventListener('keydown', changeDirection);
         }
 
         function createFood() {
@@ -1039,24 +917,23 @@
                 x: Math.floor(Math.random() * (snakeCanvas.width / GRID_SIZE)),
                 y: Math.floor(Math.random() * (snakeCanvas.height / GRID_SIZE))
             };
-            // Sørg for at mat ikke dukker opp på slangen
             snake.forEach(part => {
                 if (part.x === food.x && part.y === food.y) {
-                    createFood(); // Rekursivt hvis mat er på slangen
+                    createFood();
                 }
             });
         }
 
         function drawSnakePart(snakePart) {
-            snakeCtx.fillStyle = '#34d399'; /* Lys grønn */
-            snakeCtx.strokeStyle = '#10b981'; /* Mørkere grønn */
+            snakeCtx.fillStyle = '#00FF00'; /* Neon grønn for slange */
+            snakeCtx.strokeStyle = '#00BB00'; /* Mørkere grønn */
             snakeCtx.fillRect(snakePart.x * GRID_SIZE, snakePart.y * GRID_SIZE, GRID_SIZE, GRID_SIZE);
             snakeCtx.strokeRect(snakePart.x * GRID_SIZE, snakePart.y * GRID_SIZE, GRID_SIZE, GRID_SIZE);
         }
 
         function drawFood() {
-            snakeCtx.fillStyle = '#f87171'; /* Rød */
-            snakeCtx.strokeStyle = '#ef4444'; /* Mørkere rød */
+            snakeCtx.fillStyle = '#FF00FF'; /* Neon magenta for mat */
+            snakeCtx.strokeStyle = '#BB00BB';
             snakeCtx.fillRect(food.x * GRID_SIZE, food.y * GRID_SIZE, GRID_SIZE, GRID_SIZE);
             snakeCtx.strokeRect(food.x * GRID_SIZE, food.y * GRID_SIZE, GRID_SIZE, GRID_SIZE);
         }
@@ -1068,35 +945,33 @@
         }
 
         function advanceSnake() {
-            if (snakeGameLoopId === null && (dx === 0 && dy === 0)) return; // Spill pauset/ikke startet
+            if (snakeGameLoopId === null && (dx === 0 && dy === 0)) return;
 
             const head = { x: snake[0].x + dx, y: snake[0].y + dy };
 
-            // Sjekk for kollisjon med vegger eller seg selv
             if (
                 head.x < 0 || head.x * GRID_SIZE >= snakeCanvas.width ||
                 head.y < 0 || head.y * GRID_SIZE >= snakeCanvas.height ||
                 checkCollision(head)
             ) {
-                gameOver("Game Over! Ditt poeng: " + score);
+                gameOver("GAME OVER! DITT POENG: " + score);
                 return;
             }
 
-            snake.unshift(head); // Legg til nytt hode
+            snake.unshift(head);
 
             const didEatFood = head.x === food.x && head.y === food.y;
             if (didEatFood) {
                 score += 10;
-                document.getElementById('snakeScore').textContent = `Poeng: ${score}`;
-                createFood(); // Lag ny mat
+                document.getElementById('snakeScore').textContent = `POENG: ${score}`;
+                createFood();
             } else {
-                snake.pop(); // Fjern hale hvis ingen mat spist
+                snake.pop();
             }
             changingDirection = false;
         }
 
         function checkCollision(head) {
-            // Sjekk om slangens hode kolliderer med noen del av kroppen
             for (let i = 1; i < snake.length; i++) {
                 if (head.x === snake[i].x && head.y === snake[i].y) return true;
             }
@@ -1109,7 +984,7 @@
             const UP_KEY = 38;
             const DOWN_KEY = 40;
 
-            if (changingDirection) return; // Forhindre raske, flere tastetrykk
+            if (changingDirection) return;
             changingDirection = true;
 
             const keyPressed = event.keyCode;
@@ -1140,14 +1015,14 @@
             snakeGameLoopId = setTimeout(function onTick() {
                 advanceSnake();
                 draw();
-                gameLoop(); // Kall seg selv rekursivt
-            }, 100); // Spillhastighet (lavere er raskere)
+                gameLoop();
+            }, 100);
         }
 
         function startGame() {
-            if (snakeGameLoopId === null) { // Start kun hvis ikke allerede kjører
-                if (dx === 0 && dy === 0) { // Hvis spillet nettopp ble tilbakestilt eller aldri startet, gi en startretning
-                     dx = 1; // Start bevegelse til høyre
+            if (snakeGameLoopId === null) {
+                if (dx === 0 && dy === 0) {
+                     dx = 1;
                 }
                 gameLoop();
             }
@@ -1158,56 +1033,52 @@
                 clearTimeout(snakeGameLoopId);
                 snakeGameLoopId = null;
             } else {
-                startGame(); // Fortsett
+                startGame();
             }
         }
 
         function resetSnakeGame() {
-            clearTimeout(snakeGameLoopId); // Stopp nåværende spill-loop
+            clearTimeout(snakeGameLoopId);
             snakeGameLoopId = null;
-            snake = [{ x: 10, y: 10 }]; // Tilbakestill slangens posisjon
-            dx = 0; // Tilbakestill retning
+            snake = [{ x: 10, y: 10 }];
+            dx = 0;
             dy = 0;
             score = 0;
-            document.getElementById('snakeScore').textContent = `Poeng: ${score}`;
-            createFood(); // Plasser ny mat
-            draw(); // Første tegning
+            document.getElementById('snakeScore').textContent = `POENG: ${score}`;
+            createFood();
+            draw();
         }
 
         function gameOver(message) {
             clearTimeout(snakeGameLoopId);
             snakeGameLoopId = null;
-            // Erstatt alert med en melding i UI
             document.getElementById('snakeScore').textContent = message;
-            // resetSnakeGame(); // Tilbakestill spillet automatisk etter melding
         }
 
         // --- Pong Game ---
         let pongCanvas, pongCtx;
         let paddle1, paddle2, ball;
         let player1Score, player2Score;
-        let pongGameLoopId = null; // For requestAnimationFrame
         let pongMessageElement;
         let pongScoreElement;
 
-        // Kontrollflagg for å håndtere vedvarende tastetrykk
         const keysPressed = {};
 
         function loadPongGame() {
             gameArea.innerHTML = `
-                <div id="pongGame" class="w-full max-w-lg bg-gray-800 p-6 rounded-xl shadow-lg flex flex-col items-center">
-                    <h2 class="text-2xl font-bold text-red-400 mb-4">Pong</h2>
-                    <canvas id="pongCanvas" width="500" height="300" class="border-2 border-red-500 rounded-lg"></canvas>
+                <div id="pongGame" class="w-full max-w-lg p-4 flex flex-col items-center">
+                    <h2>PONG</h2>
+                    <canvas id="pongCanvas" width="500" height="300"></canvas>
                     <div id="pongGameControls" class="mt-4 flex gap-4">
-                        <button onclick="startGamePong()">Start Spill</button>
-                        <button onclick="resetPongGame()">Nytt Spill</button>
+                        <button onclick="startGamePong()">START SPILL</button>
+                        <button onclick="resetPongGame()">NYTT SPILL</button>
                     </div>
-                    <p id="pongScore" class="mt-4 text-xl font-bold text-red-300">Poeng: Spiller 1: 0 - Spiller 2: 0</p>
-                    <p id="pongMessage" class="mt-2 text-lg text-yellow-300"></p>
+                    <p id="pongScore" class="mt-4">POENG: SPILLER 1: 0 - SPILLER 2: 0</p>
+                    <p id="pongMessage" class="mt-2"></p>
                     <div class="pong-controls-info">
-                        <p>Kontroller:</p>
-                        <p>Spiller 1 (venstre): W (opp), S (ned)</p>
-                        <p>Spiller 2 (høyre): Pil opp, Pil ned</p>
+                        <p>KONTROLLER:</p>
+                        <p>SPILLER 1 (VENSTRE): W (OPP), S (NED)</p>
+                        <p>SPILLER 2 (HØYRE): PIL OPP, PIL NED</p>
                     </div>
                 </div>
             `;
@@ -1216,7 +1087,6 @@
             pongMessageElement = document.getElementById('pongMessage');
             pongScoreElement = document.getElementById('pongScore');
 
-            // Legg til tastaturlyttere
             document.addEventListener('keydown', handlePongKeyPress);
             document.addEventListener('keyup', handlePongKeyRelease);
 
@@ -1224,12 +1094,9 @@
         }
 
         function initPongObjects() {
-            // Paddle setup
-            paddle1 = { x: 10, y: pongCanvas.height / 2 - 30, width: 10, height: 60, dy: 0, color: '#06b6d4' };
-            paddle2 = { x: pongCanvas.width - 20, y: pongCanvas.height / 2 - 30, width: 10, height: 60, dy: 0, color: '#f87171' };
-
-            // Ball setup
-            ball = { x: pongCanvas.width / 2, y: pongCanvas.height / 2, radius: 7, dx: 0, dy: 0, color: '#e0e7ff' };
+            paddle1 = { x: 10, y: pongCanvas.height / 2 - 30, width: 10, height: 60, dy: 0, color: '#00FFFF' }; /* Neon cyan */
+            paddle2 = { x: pongCanvas.width - 20, y: pongCanvas.height / 2 - 30, width: 10, height: 60, dy: 0, color: '#FF00FF' }; /* Neon magenta */
+            ball = { x: pongCanvas.width / 2, y: pongCanvas.height / 2, radius: 7, dx: 0, dy: 0, color: '#FFFF00' }; /* Neon gul */
         }
 
         function resetPongGame() {
@@ -1241,39 +1108,35 @@
             player1Score = 0;
             player2Score = 0;
             updatePongScore();
-            pongMessageElement.textContent = "Trykk 'Start Spill' for å begynne!";
-            initPongObjects(); // Tilbakestill posisjoner
+            pongMessageElement.textContent = "TRYKK 'START SPILL' FOR Å BEGYNNE!";
+            initPongObjects();
             drawPong();
         }
 
         function serveBall() {
             ball.x = pongCanvas.width / 2;
             ball.y = pongCanvas.height / 2;
-            ball.dx = (Math.random() > 0.5 ? 3 : -3) * (Math.random() > 0.5 ? 1 : 1); // Start med tilfeldig retning
-            ball.dy = (Math.random() * 2 - 1) * 2; // Litt tilfeldig vertikal retning
+            ball.dx = (Math.random() > 0.5 ? 3 : -3) * (Math.random() > 0.5 ? 1 : 1);
+            ball.dy = (Math.random() * 2 - 1) * 2;
         }
 
         function drawPong() {
-            // Bakgrunn
             pongCtx.fillStyle = 'black';
             pongCtx.fillRect(0, 0, pongCanvas.width, pongCanvas.height);
 
-            // Midtlinje
-            pongCtx.strokeStyle = '#6b7280';
+            pongCtx.strokeStyle = '#00FFFF'; /* Neon cyan midtlinje */
             pongCtx.beginPath();
             pongCtx.setLineDash([5, 5]);
             pongCtx.moveTo(pongCanvas.width / 2, 0);
             pongCtx.lineTo(pongCanvas.width / 2, pongCanvas.height);
             pongCtx.stroke();
-            pongCtx.setLineDash([]); // Tilbakestill
+            pongCtx.setLineDash([]);
 
-            // Paddles
             pongCtx.fillStyle = paddle1.color;
             pongCtx.fillRect(paddle1.x, paddle1.y, paddle1.width, paddle1.height);
             pongCtx.fillStyle = paddle2.color;
             pongCtx.fillRect(paddle2.x, paddle2.y, paddle2.width, paddle2.height);
 
-            // Ball
             pongCtx.beginPath();
             pongCtx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
             pongCtx.fillStyle = ball.color;
@@ -1281,70 +1144,61 @@
         }
 
         function updatePong() {
-            // Flytt paddles
             paddle1.y += paddle1.dy;
             paddle2.y += paddle2.dy;
 
-            // Hold paddles innenfor grenser
             if (paddle1.y < 0) paddle1.y = 0;
             if (paddle1.y + paddle1.height > pongCanvas.height) paddle1.y = pongCanvas.height - paddle1.height;
             if (paddle2.y < 0) paddle2.y = 0;
             if (paddle2.y + paddle2.height > pongCanvas.height) paddle2.y = pongCanvas.height - paddle2.height;
 
-            // Flytt ball
             ball.x += ball.dx;
             ball.y += ball.dy;
 
-            // Ball kollisjon med topp/bunn vegger
             if (ball.y - ball.radius < 0 || ball.y + ball.radius > pongCanvas.height) {
                 ball.dy = -ball.dy;
             }
 
-            // Ball kollisjon med paddles
-            // Spiller 1 (venstre)
             if (ball.dx < 0 &&
                 ball.x - ball.radius < paddle1.x + paddle1.width &&
                 ball.y > paddle1.y &&
                 ball.y < paddle1.y + paddle1.height) {
-                ball.dx = -ball.dx; // Reverser x-retning
-                // Juster y-retning basert på hvor på paddle den traff
+                ball.dx = -ball.dx;
                 let collidePoint = ball.y - (paddle1.y + paddle1.height / 2);
-                collidePoint = collidePoint / (paddle1.height / 2); // Normaliser til -1 til 1
-                ball.dy = collidePoint * 5; // Hastighet
+                collidePoint = collidePoint / (paddle1.height / 2);
+                ball.dy = collidePoint * 5;
             }
-            // Spiller 2 (høyre)
             else if (ball.dx > 0 &&
                      ball.x + ball.radius > paddle2.x &&
                      ball.y > paddle2.y &&
                      ball.y < paddle2.y + paddle2.height) {
-                ball.dx = -ball.dx; // Reverser x-retning
+                ball.dx = -ball.dx;
                 let collidePoint = ball.y - (paddle2.y + paddle2.height / 2);
                 collidePoint = collidePoint / (paddle2.height / 2);
                 ball.dy = collidePoint * 5;
             }
 
-            // Ball utenfor banen (poeng)
             if (ball.x - ball.radius < 0) {
                 player2Score++;
                 updatePongScore();
                 if (player2Score >= 5) {
-                    gameOverPong("Spiller 2 vant! 🏆");
+                    gameOverPong("SPILLER 2 VANT! 🏆");
                 } else {
-                    serveBall(); // Ny serve
+                    serveBall();
                 }
             } else if (ball.x + ball.radius > pongCanvas.width) {
                 player1Score++;
                 updatePongScore();
                 if (player1Score >= 5) {
-                    gameOverPong("Spiller 1 vant! 🏆");
+                    gameOverPong("SPILLER 1 VANT! 🏆");
                 } else {
-                    serveBall(); // Ny serve
+                    serveBall();
                 }
             }
         }
 
         function updatePongScore() {
-            pongScoreElement.textContent = `Poeng: Spiller 1: ${player1Score} - Spiller 2: ${player2Score}`;
+            pongScoreElement.textContent = `POENG: SPILLER 1: ${player1Score} - SPILLER 2: ${player2Score}`;
         }
 
         function gameOverPong(message) {
@@ -1362,26 +1216,24 @@
         }
 
         function startGamePong() {
-            if (pongAnimationFrameId) { // If already running, do nothing
+            if (pongAnimationFrameId) {
                 return;
             }
             pongMessageElement.textContent = "";
-            serveBall(); // Start med å serve ballen
+            serveBall();
             pongGameLoop();
         }
 
         function handlePongKeyPress(event) {
             keysPressed[event.key] = true;
-            if (pongAnimationFrameId === null) return; // Ikke beveg paddles hvis spillet ikke kjører
+            if (pongAnimationFrameId === null) return;
 
-            // Player 1 controls (W, S)
             if (keysPressed['w'] || keysPressed['W']) {
                 paddle1.dy = -5;
             } else if (keysPressed['s'] || keysPressed['S']) {
                 paddle1.dy = 5;
             }
 
-            // Player 2 controls (ArrowUp, ArrowDown)
             if (keysPressed['ArrowUp']) {
                 paddle2.dy = -5;
             } else if (keysPressed['ArrowDown']) {
@@ -1392,276 +1244,180 @@
         function handlePongKeyRelease(event) {
             keysPressed[event.key] = false;
 
-            // Player 1
             if (!(keysPressed['w'] || keysPressed['W'] || keysPressed['s'] || keysPressed['S'])) {
                 paddle1.dy = 0;
-            } else if (keysPressed['w'] || keysPressed['W']) { // If 'w' or 'W' is still pressed after 's' is released
+            } else if (keysPressed['w'] || keysPressed['W']) {
                 paddle1.dy = -5;
-            } else if (keysPressed['s'] || keysPressed['S']) { // If 's' or 'S' is still pressed after 'w' is released
+            } else if (keysPressed['s'] || keysPressed['S']) {
                 paddle1.dy = 5;
             }
 
-            // Player 2
             if (!(keysPressed['ArrowUp'] || keysPressed['ArrowDown'])) {
                 paddle2.dy = 0;
-            } else if (keysPressed['ArrowUp']) { // If 'ArrowUp' is still pressed after 'ArrowDown' is released
+            } else if (keysPressed['ArrowUp']) {
                 paddle2.dy = -5;
-            } else if (keysPressed['ArrowDown']) { // If 'ArrowDown' is still pressed after 'ArrowUp' is released
+            } else if (keysPressed['ArrowDown']) {
                 paddle2.dy = 5;
             }
         }
 
-        // --- AI Chat ---
-        let chatHistory = []; // Stores the chat history for AI model context
-        const AI_CHAT_HISTORY_KEY = 'aiChatHistory'; // Key for localStorage
+        // --- AI Chat (Removed from this visual layout to match image) ---
+        // Functions and variables are kept but not called by the UI.
+        let chatHistory = [];
+        const AI_CHAT_HISTORY_KEY = 'aiChatHistory';
+        const tools = []; // Tools will not be used in this simplified UI
 
-        // Tool definition for Google Search (This is passed to the Gemini model)
-        const tools = [
-            {
-                functionDeclarations: [
-                    {
-                        name: "google_search_search",
-                        description: "Søk på Google etter informasjon. Bruk dette verktøyet når brukeren spør om fakta, definisjoner, nyheter, eller generell kunnskap som krever oppdatert informasjon eller bredere kontekst enn AI-ens standard treningsdata.",
-                        parameters: {
-                            type: "OBJECT",
-                            properties: {
-                                queries: {
-                                    type: "ARRAY",
-                                    items: {
-                                        type: "STRING"
-                                    },
-                                    description: "Liste over søkestrenger. Minimum 1 søkestreng. Maks 3 søkestrenger.",
-                                    minItems: 1,
-                                    maxItems: 3
-                                }
-                            },
-                            required: ["queries"]
-                        }
-                    }
-                ]
-            }
-        ];
+        function displayAIChatMessage(message, type) { /* No-op in this UI */ }
+        function loadAIChatHistory() { /* No-op in this UI */ }
+        function saveAIChatHistory() { /* No-op in this UI */ }
+        function resetAIChat() { /* No-op in this UI */ }
+        async function sendMessage() { /* No-op in this UI */ }
+        async function googleSearch(queries) { /* No-op in this UI */ return []; }
 
-        function showAIChatPanel() {
-            aiChatContainer.classList.remove('hidden'); // Vis chat-containeren
-            loadAIChatHistory(); // Last chat-historikk ved visning
-            const chatOutput = document.getElementById('chatOutput');
-            const chatInput = document.getElementById('chatInput');
+        // --- Bruker Chat (Firestore) ---
+        let userChatUnsubscribe = null;
 
-            chatOutput.innerHTML = ''; // Tøm display, fyll fra historikk
-            if (chatHistory.length === 0) {
-                // Initial system instruction/persona for the AI
-                chatHistory.push({ role: "user", parts: [{ text: "Du er en vennlig og hjelpsom AI-assistent for en minispillside. Du skal gi korte, relevante svar på spørsmål og oppmuntre brukeren til å spille spillene på siden." }] });
-                displayAIChatMessage("Hei! Jeg er din AI-assistent. Hva kan jeg hjelpe deg med i dag?", 'ai-message');
-                saveAIChatHistory(); // Lagre initial melding
-            } else {
-                // Re-display existing chat history
-                chatHistory.forEach(msg => {
-                    if (msg.role === "user") {
-                        displayAIChatMessage(msg.parts[0].text, 'user-message');
-                    } else if (msg.role === "model") {
-                        if (msg.parts[0].text) { // Bare vis tekst-svar, ikke tool-calls
-                            displayAIChatMessage(msg.parts[0].text, 'ai-message');
-                        }
-                    }
-                });
-            }
-            chatOutput.scrollTop = chatOutput.scrollHeight; // Scroll til bunn
-            chatInput.focus();
-        }
+        // Note: userChatContainer is no longer hidden/shown by loadGame.
+        // It's a persistent bottom element now, managed by its own init logic.
 
-        function hideAIChatPanel() {
-            aiChatContainer.classList.add('hidden'); // Skjul chat-containeren
-        }
+        // The user ID display is updated when Firebase Auth is ready in the module script.
+        // `userChatContainer` is always present, no need to hide/show its class.
+        // The `showUserChatPanel` and `hideUserChatPanel` functions are removed
+        // as the user chat is now a permanent fixture matching the image.
 
-        function displayAIChatMessage(message, type) {
-            const chatOutput = document.getElementById('chatOutput');
+        function displayUserChatMessage(message, userId, timestamp) {
+            const userChatOutput = document.getElementById('userChatOutput');
+            if (!userChatOutput) return; // Ensure element exists
+
             const messageDiv = document.createElement('div');
-            messageDiv.className = `chat-message ${type}`;
-            messageDiv.textContent = message;
-            chatOutput.appendChild(messageDiv);
-            chatOutput.scrollTop = chatOutput.scrollHeight; // Scroll to bottom
-        }
-
-        function loadAIChatHistory() {
-            const historyJson = localStorage.getItem(AI_CHAT_HISTORY_KEY);
-            if (historyJson) {
-                chatHistory = JSON.parse(historyJson);
-                // Filter out the initial persona message if it's the only one
-                if (chatHistory.length === 1 && chatHistory[0].role === "user" && chatHistory[0].parts[0].text.includes("Du er en vennlig og hjelpsom AI-assistent")) {
-                    chatHistory = []; // Clear if only persona is present
-                }
-            } else {
-                chatHistory = [];
+            
+            let messageClass = 'user-chat-message';
+            // Use the actual currentUserId from the global window scope
+            if (userId === window.currentUserId) {
+                messageClass = 'current-user-chat-message';
             }
+
+            const date = timestamp ? new Date(timestamp.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'NÅ';
+            
+            messageDiv.className = `chat-message ${messageClass}`;
+            messageDiv.innerHTML = `<span class="font-bold text-xs">${userId.substring(0, 8)}...</span> <span class="text-xs text-gray-200">${date}</span><br>${message.toUpperCase()}`; // Store bokstaver
+            userChatOutput.appendChild(messageDiv);
+            userChatOutput.scrollTop = userChatOutput.scrollHeight;
         }
 
-        function saveAIChatHistory() {
-            localStorage.setItem(AI_CHAT_HISTORY_KEY, JSON.stringify(chatHistory));
+        function setupUserChatListener() {
+            if (userChatUnsubscribe) {
+                userChatUnsubscribe();
+            }
+
+            // Check if db and appId are available from the module script
+            if (!window.db || !window.__app_id) {
+                console.error("Firebase DB or App ID not available for chat listener.");
+                document.getElementById('userChatOutput').innerHTML = '<div class="chat-message ai-message text-red-400">FEIL: KAN IKKE KOBLE TIL CHAT.</div>';
+                return;
+            }
+
+            const chatCollectionRef = window.collection(window.db, `artifacts/${window.__app_id}/public/data/user_chats`);
+            const q = window.query(chatCollectionRef, window.orderBy('timestamp', 'asc'));
+
+            userChatUnsubscribe = window.onSnapshot(q, (snapshot) => {
+                const userChatOutput = document.getElementById('userChatOutput');
+                userChatOutput.innerHTML = ''; // Tøm for å laste inn på nytt
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    displayUserChatMessage(data.message, data.userId, data.timestamp);
+                });
+            }, (error) => {
+                console.error("Feil ved henting av chatmeldinger:", error);
+                document.getElementById('userChatOutput').innerHTML = '<div class="chat-message ai-message text-red-400">FEIL VED LASTING AV CHATMELDINGER.</div>';
+            });
+            console.log("User chat listener subscribed.");
         }
 
-        function resetAIChat() {
-            localStorage.removeItem(AI_CHAT_HISTORY_KEY); // Clear history from local storage
-            chatHistory = []; // Reset in memory as well
-            showAIChatPanel(); // Reload chat interface, which will re-initialize history with persona
-        }
 
-        async function sendMessage() {
-            const chatInput = document.getElementById('chatInput');
-            const chatSendButton = document.getElementById('chatSendButton');
-            const loadingIndicator = document.getElementById('loadingIndicator');
-            const userMessage = chatInput.value.trim();
+        async function sendMessageUserChat() {
+            const userChatInput = document.getElementById('userChatInput');
+            const userChatSendButton = document.getElementById('userChatSendButton');
+            const userChatLoadingIndicator = document.getElementById('userChatLoadingIndicator');
+            const message = userChatInput.value.trim();
 
-            if (userMessage === '') return;
+            if (message === '' || !window.auth.currentUser) return;
 
-            displayAIChatMessage(userMessage, 'user-message');
-            chatHistory.push({ role: "user", parts: [{ text: userMessage }] });
-            saveAIChatHistory();
-
-            chatInput.value = '';
-            chatSendButton.disabled = true;
-            loadingIndicator.classList.remove('hidden');
+            userChatInput.value = '';
+            userChatSendButton.disabled = true;
+            userChatLoadingIndicator.classList.remove('hidden');
 
             try {
-                // First call to potentially get tool calls
-                const payload1 = { contents: chatHistory, tools: tools };
-                const apiKey = ""; // Canvas handles API key
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-                const response1 = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload1)
+                const chatCollectionRef = window.collection(window.db, `artifacts/${window.__app_id}/public/data/user_chats`);
+                await window.addDoc(chatCollectionRef, {
+                    userId: window.currentUserId,
+                    message: message,
+                    timestamp: window.serverTimestamp()
                 });
-
-                const result1 = await response1.json();
-
-                if (result1.candidates && result1.candidates.length > 0) {
-                    const candidate = result1.candidates[0];
-
-                    if (candidate.toolCalls && candidate.toolCalls.length > 0) {
-                        // AI wants to use a tool (e.g., google_search)
-                        const toolCall = candidate.toolCalls[0]; // Assuming one tool call for simplicity
-                        
-                        if (toolCall.functionCall.name === "google_search_search") {
-                            // Execute google_search tool
-                            const queries = toolCall.functionCall.args.queries;
-                            loadingIndicator.textContent = "AI søker på Google..."; // Update loading message
-                            
-                            // Simulate tool execution (replace with actual API call if not in Canvas)
-                            const toolResponse = await googleSearch(queries); // This will call the helper function below
-
-                            // Add tool response to history
-                            chatHistory.push({
-                                role: "tool",
-                                parts: [{
-                                    functionResponse: {
-                                        name: "google_search_search",
-                                        response: toolResponse
-                                    }
-                                }]
-                            });
-                            saveAIChatHistory();
-
-                            // Make second call with tool response in history
-                            loadingIndicator.textContent = "AI tenker på svaret..."; // Update loading message
-                            const payload2 = { contents: chatHistory, tools: tools }; // Include tools again
-                            const response2 = await fetch(apiUrl, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify(payload2)
-                            });
-                            const result2 = await response2.json();
-
-                            if (result2.candidates && result2.candidates.length > 0 &&
-                                result2.candidates[0].content && result2.candidates[0].content.parts &&
-                                result2.candidates[0].content.parts.length > 0) {
-                                const aiResponse = result2.candidates[0].content.parts[0].text;
-                                displayAIChatMessage(aiResponse, 'ai-message');
-                                chatHistory.push({ role: "model", parts: [{ text: aiResponse }] });
-                                saveAIChatHistory();
-                            } else {
-                                displayAIChatMessage("Beklager, jeg fikk ikke et svar etter søk. Prøv igjen.", 'ai-message');
-                                console.error("Uventet AI-responsstruktur etter søk:", result2);
-                            }
-
-                        } else {
-                            displayAIChatMessage("AI forsøkte å bruke et ukjent verktøy.", 'ai-message');
-                            console.error("Ukjent verktøy kalt:", toolCall.functionCall.name);
-                        }
-
-                    } else if (candidate.content && candidate.content.parts && candidate.content.parts.length > 0) {
-                        // AI responds directly without a tool
-                        const aiResponse = candidate.content.parts[0].text;
-                        displayAIChatMessage(aiResponse, 'ai-message');
-                        chatHistory.push({ role: "model", parts: [{ text: aiResponse }] });
-                        saveAIChatHistory();
-                    } else {
-                        displayAIChatMessage("Beklager, jeg fikk et tomt svar fra AI. Prøv igjen.", 'ai-message');
-                        console.error("Tomt AI-svar:", result1);
-                    }
-                } else {
-                    displayAIChatMessage("Beklager, jeg fikk ingen kandidater fra AI. Prøv igjen.", 'ai-message');
-                    console.error("Ingen AI-kandidater:", result1);
-                }
-
             } catch (error) {
-                console.error("Feil ved henting av AI-svar:", error);
-                displayAIChatMessage("En feil oppstod. Klarte ikke å hente svar fra AI.", 'ai-message');
+                console.error("Feil ved sending av melding:", error);
             } finally {
-                chatSendButton.disabled = false;
-                loadingIndicator.classList.add('hidden');
-                loadingIndicator.textContent = "AI tenker..."; // Reset loading message
-                chatInput.focus();
+                userChatSendButton.disabled = false;
+                userChatLoadingIndicator.classList.add('hidden');
+                userChatInput.focus();
             }
         }
 
-        // Helper function to simulate google_search tool call
-        // In a real Canvas environment, this would be handled by the backend directly
-        // but here we simulate the client-side API call for the purpose of the immersive.
-        async function googleSearch(queries) {
-            const searchResults = [];
-            for (const query of queries) {
-                // In a real application, you would make a fetch call to a backend
-                // that then calls the Google Search API (e.g., Custom Search API, SerpApi, etc.)
-                // Directly calling Google Search API from client-side is not recommended due to API key exposure
-                // For this Canvas environment, we are simulating the Google Search API call.
-                // The actual `google_search.search` call is handled by the Canvas runtime.
-                // Here, we're just formatting the expected output structure for the model.
+        async function clearUserChat() {
+            // Using a simple message box instead of confirm()
+            const confirmClear = document.createElement('div');
+            confirmClear.className = "fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50";
+            confirmClear.innerHTML = `
+                <div class="retro-box p-8 max-w-sm mx-auto text-center">
+                    <p class="mb-4">ER DU SIKKER PÅ AT DU VIL TØMME HELE CHAT-HISTORIKKEN FOR ALLE BRUKERE? DENNE HANDLINGEN KAN IKKE ANGRERES.</p>
+                    <button id="confirmClearBtn" class="retro-button mr-2">JA</button>
+                    <button id="cancelClearBtn" class="retro-button">AVBRYT</button>
+                </div>
+            `;
+            document.body.appendChild(confirmClear);
 
-                // Example of a simulated search result for demonstration:
-                // This part will be replaced by the actual tool execution in the Canvas environment.
-                // For the purpose of this example, we need to return a structure that the model expects.
+            return new Promise(resolve => {
+                document.getElementById('confirmClearBtn').onclick = async () => {
+                    document.body.removeChild(confirmClear);
+                    const userChatOutput = document.getElementById('userChatOutput');
+                    if (userChatOutput) {
+                        userChatOutput.innerHTML = '<div class="chat-message ai-message" style="color: #FFFF00;">TØMMER CHAT...</div>'; // Feedback til bruker
+                    }
+                    try {
+                        const chatCollectionRef = window.collection(window.db, `artifacts/${window.__app_id}/public/data/user_chats`);
+                        const q = window.query(chatCollectionRef);
+                        const querySnapshot = await window.getDocs(q);
 
-                let dummyResults = {
-                    query: query,
-                    results: [
-                        { snippet: `Søkeresultat for '${query}': Her er et generelt svar fra en simuliert søk om ${query}. Dette er kun for å demonstrere at verktøyet ble brukt.` },
-                        { snippet: `Mer informasjon: En typisk søkemotor ville funnet relevanter lenker og utdrag om ${query}.` }
-                    ]
+                        const deletePromises = [];
+                        querySnapshot.forEach((doc) => {
+                            deletePromises.push(window.deleteDoc(window.doc(window.db, `artifacts/${window.__app_id}/public/data/user_chats`, doc.id)));
+                        });
+                        await Promise.all(deletePromises);
+                        console.log("Chat historikk tømt.");
+                        resolve(true); // Indicate success
+                    } catch (error) {
+                        console.error("Feil ved tømming av chat-historikk:", error);
+                        if (userChatOutput) {
+                            userChatOutput.innerHTML = '<div class="chat-message ai-message text-red-400">FEIL VED TØMMING AV CHAT.</div>';
+                        }
+                        resolve(false); // Indicate failure
+                    }
                 };
-
-                // The actual call if this were a backend service
-                // const searchResponse = await fetch('YOUR_BACKEND_SEARCH_ENDPOINT', {
-                //     method: 'POST',
-                //     headers: { 'Content-Type': 'application/json' },
-                //     body: JSON.stringify({ query: query })
-                // });
-                // const searchData = await searchResponse.json();
-                // searchResults.push(searchData);
-
-                // For Canvas context, the model expects a direct `functionResponse` with the structured data.
-                // We'll just return the simulated data here, as the model's call will trigger the actual tool.
-                searchResults.push(dummyResults);
-            }
-            // Return the structured output that the model expects from a tool
-            // For `google_search`, it returns a list of SearchResults objects.
-            return searchResults;
+                document.getElementById('cancelClearBtn').onclick = () => {
+                    document.body.removeChild(confirmClear);
+                    resolve(false); // Indicate cancellation
+                };
+            });
         }
 
 
         // Laster "Gjett Tallet"-spillet automatisk når siden lastes som standard
-        window.onload = () => loadGame('guessTheNumber');
+        window.onload = () => {
+            // Sørg for at Firebase initialiseres først, deretter lastes spillet
+            // Autentiseringslogikken i type="module" scriptet kjører parallelt.
+            // onAuthStateChanged vil kalle setupUserChatListener når brukeren er klar.
+            loadGame('guessTheNumber');
+        };
 
     </script>
 </body>
