@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minispill | Bruk Tid</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom font for better readability */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1f2937; /* Mørk bakgrunn */
+            color: #f3f4f6; /* Lys tekstfarge */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1.5rem;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: #374151; /* Mørkere grå for hovedcontainer */
+            border-radius: 1.5rem; /* runde hjørner */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1); /* skygge */
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 900px; /* Maks bredde for lesbarhet */
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 3rem; /* Stor tittel */
+            font-weight: bold;
+            color: #a78bfa; /* Lys lilla */
+            margin-bottom: 0.5rem;
+        }
+
+        .game-menu {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .game-button {
+            background-image: linear-gradient(to right, #6366f1, #8b5cf6); /* Gradient-knapp */
+            color: white;
+            border-radius: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            border: none;
+            flex: 1 1 auto; /* Fleksibel bredde */
+            max-width: 200px; /* Maks bredde for hver knapp */
+        }
+
+        .game-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-area {
+            background-color: #4b5563; /* Lysere grå for spillområdet */
+            border-radius: 1rem;
+            padding: 2rem;
+            min-height: 300px; /* Minimum høyde for spillinnhold */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        /* Spesifikke stiler for "Gjett Tallet"-spillet */
+        #guessTheNumberGame h2 {
+            font-size: 2.25rem;
+            font-weight: bold;
+            color: #34d399; /* Grønn tittel for spillet */
+            margin-bottom: 1.5rem;
+        }
+
+        #guessTheNumberGame input[type="number"] {
+            background-color: #6b7280; /* Mørkere inputfelt */
+            color: #f3f4f6;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            border: 1px solid #4b5563;
+            width: 100%;
+            max-width: 200px;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-size: 1.25rem;
+        }
+
+        #guessTheNumberGame button {
+            background-image: linear-gradient(to right, #10b981, #059669); /* Grønn gradient knapp */
+            color: white;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            font-weight: 600;
+            transition: all 0.2s ease-in-out;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        #guessTheNumberGame button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        #guessTheNumberGame #gameMessage {
+            margin-top: 1.5rem;
+            font-size: 1.125rem;
+            font-weight: 500;
+        }
+
+        #guessTheNumberGame #attemptsCount {
+            margin-top: 0.5rem;
+            font-size: 0.95rem;
+            color: #d1d5db; /* Lysere grå tekst */
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.875rem;
+            color: #9ca3af; /* Gråere tekst */
+        }
+
+        /* Responsivitet for små skjermer */
+        @media (max-width: 640px) {
+            .container {
+                padding: 1.5rem;
+                gap: 1.5rem;
+            }
+            h1 {
+                font-size: 2.25rem;
+            }
+            #guessTheNumberGame h2 {
+                font-size: 1.75rem;
+            }
+            .game-button {
+                width: 100%;
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Minispill for Tidsfordriv</h1>
+            <p class="text-gray-300">Finn ditt favorittspill for å slappe av og ha det gøy!</p>
+        </header>
+
+        <nav class="game-menu">
+            <button class="game-button" onclick="loadGame('guessTheNumber')">Gjett Tallet</button>
+            <button class="game-button" onclick="loadGame('anotherGame')" disabled>Et Annet Spill (kommer)</button>
+            <!-- Legg til flere spillknapper her -->
+        </nav>
+
+        <main class="game-area" id="gameArea">
+            <!-- Spillinnholdet vil lastes inn her via JavaScript -->
+            <p class="text-xl text-gray-400">Velg et spill fra menyen over for å begynne!</p>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 Minispill. Alle rettigheter reservert.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Referanse til spillområdet
+        const gameArea = document.getElementById('gameArea');
+
+        // Funksjon for å laste et spill inn i spillområdet
+        function loadGame(gameName) {
+            gameArea.innerHTML = ''; // Tømmer spillområdet
+
+            switch (gameName) {
+                case 'guessTheNumber':
+                    loadGuessTheNumberGame();
+                    break;
+                case 'anotherGame':
+                    gameArea.innerHTML = '<h2 class="text-2xl text-yellow-400">Dette spillet kommer snart!</h2><p class="mt-2 text-gray-300">Følg med for mer moro.</p>';
+                    break;
+                default:
+                    gameArea.innerHTML = '<p class="text-xl text-red-500">Ukjent spill.</p>';
+            }
+        }
+
+        // --- Gjett Tallet-spillet ---
+        function loadGuessTheNumberGame() {
+            gameArea.innerHTML = `
+                <div id="guessTheNumberGame" class="w-full max-w-md bg-gray-700 p-8 rounded-xl shadow-lg">
+                    <h2 class="mb-6">Gjett Tallet!</h2>
+                    <p class="text-lg mb-4">Jeg tenker på et tall mellom 1 og 100.</p>
+                    <input type="number" id="guessInput" placeholder="Skriv inn ditt gjetning" min="1" max="100" class="focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <button onclick="checkGuess()" class="mt-4 w-full">Gjett!</button>
+                    <p id="gameMessage" class="text-gray-200 mt-4"></p>
+                    <p id="attemptsCount" class="text-gray-400"></p>
+                    <button onclick="resetGuessTheNumberGame()" class="mt-6 bg-red-600 hover:bg-red-700 w-full">Start Nytt Spill</button>
+                </div>
+            `;
+
+            // Initialiser spillvariabler for "Gjett Tallet"
+            secretNumber = generateRandomNumber(1, 100);
+            attempts = 0;
+            updateGuessTheNumberUI();
+            console.log("Secret number (for testing):", secretNumber); // Fjern denne i et ekte spill!
+        }
+
+        let secretNumber;
+        let attempts;
+
+        function generateRandomNumber(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function updateGuessTheNumberUI() {
+            document.getElementById('attemptsCount').textContent = `Antall forsøk: ${attempts}`;
+        }
+
+        function checkGuess() {
+            const guessInput = document.getElementById('guessInput');
+            const gameMessage = document.getElementById('gameMessage');
+            const guess = parseInt(guessInput.value);
+
+            if (isNaN(guess) || guess < 1 || guess > 100) {
+                gameMessage.textContent = "Vennligst skriv inn et gyldig tall mellom 1 og 100.";
+                gameMessage.style.color = '#f87171'; /* rød */
+                return;
+            }
+
+            attempts++;
+            updateGuessTheNumberUI();
+
+            if (guess === secretNumber) {
+                gameMessage.textContent = `Gratulerer! Du gjettet riktig tall (${secretNumber}) på ${attempts} forsøk!`;
+                gameMessage.style.color = '#34d399'; /* grønn */
+                guessInput.disabled = true; // Deaktiver input etter vinner
+            } else if (guess < secretNumber) {
+                gameMessage.textContent = "For lavt! Prøv et høyere tall.";
+                gameMessage.style.color = '#facc15'; /* gul */
+            } else {
+                gameMessage.textContent = "For høyt! Prøv et lavere tall.";
+                gameMessage.style.color = '#facc15'; /* gul */
+            }
+
+            guessInput.value = ''; // Tøm inputfeltet
+            guessInput.focus(); // Sett fokus tilbake til inputfeltet
+        }
+
+        function resetGuessTheNumberGame() {
+            secretNumber = generateRandomNumber(1, 100);
+            attempts = 0;
+            document.getElementById('guessInput').value = '';
+            document.getElementById('guessInput').disabled = false;
+            document.getElementById('gameMessage').textContent = '';
+            updateGuessTheNumberUI();
+            console.log("Secret number (for testing):", secretNumber); // Fjern denne i et ekte spill!
+        }
+
+        // Laster "Gjett Tallet"-spillet automatisk når siden lastes
+        window.onload = () => loadGame('guessTheNumber');
+
+    </script>
+</body>
+</html>
