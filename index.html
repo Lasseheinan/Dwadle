@@ -241,6 +241,72 @@
             font-weight: 500;
         }
 
+        /* Spesifikke stiler for Retro Spill-seksjonen */
+        .retro-game-menu {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            max-width: 600px; /* Passende bredde for retro-meny */
+        }
+
+        .retro-game-button {
+            background-image: linear-gradient(to right, #06b6d4, #0ea5e9); /* Blå gradient */
+            color: white;
+            border-radius: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            border: none;
+            flex: 1 1 auto;
+            max-width: 180px;
+        }
+
+        .retro-game-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Snake Game Canvas */
+        #snakeCanvas {
+            background-color: #1a4d2e; /* Mørk grønn for slangespillet */
+            border: 2px solid #34d399;
+            border-radius: 0.5rem;
+            cursor: pointer;
+        }
+        #snakeGameControls {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        #snakeGameControls button {
+            background-image: linear-gradient(to right, #a78bfa, #c084fc); /* Lilla gradient */
+            color: white;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            font-weight: 600;
+            transition: all 0.2s ease-in-out;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        #snakeGameControls button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        #snakeScore {
+            margin-top: 1rem;
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #34d399;
+        }
+
 
         footer {
             text-align: center;
@@ -261,7 +327,7 @@
             #guessTheNumberGame h2, #questionGame h2 {
                 font-size: 1.75rem;
             }
-            .game-button {
+            .game-button, .retro-game-button {
                 width: 100%;
                 max-width: none;
             }
@@ -270,6 +336,10 @@
             }
             #questionGame input[type="text"] {
                 max-width: 100%;
+            }
+            #snakeCanvas {
+                width: 100%;
+                height: auto; /* Justeres basert på aspect ratio */
             }
         }
     </style>
@@ -284,6 +354,7 @@
         <nav class="game-menu">
             <button class="game-button" onclick="loadGame('guessTheNumber')">Gjett Tallet</button>
             <button class="game-button" onclick="loadGame('questionGame')">Spørsmålsspill</button>
+            <button class="game-button" onclick="loadGame('retroGames')">Retro Spill</button>
             <button class="game-button" onclick="loadGame('anotherGame')" disabled>Et Annet Spill (kommer)</button>
             <!-- Legg til flere spillknapper her -->
         </nav>
@@ -305,6 +376,8 @@
         // Funksjon for å laste et spill inn i spillområdet
         function loadGame(gameName) {
             gameArea.innerHTML = ''; // Tømmer spillområdet
+            // Stopp alle aktive spill-looper før et nytt spill lastes
+            stopAllGameLoops();
 
             switch (gameName) {
                 case 'guessTheNumber':
@@ -313,6 +386,12 @@
                 case 'questionGame':
                     loadQuestionGame();
                     break;
+                case 'retroGames':
+                    loadRetroGamesMenu();
+                    break;
+                case 'snakeGame': // Spesifikt for Snake, lastes fra retroGames menu
+                    loadSnakeGame();
+                    break;
                 case 'anotherGame':
                     gameArea.innerHTML = '<h2 class="text-2xl text-yellow-400">Dette spillet kommer snart!</h2><p class="mt-2 text-gray-300">Følg med for mer moro.</p>';
                     break;
@@ -320,6 +399,17 @@
                     gameArea.innerHTML = '<p class="text-xl text-red-500">Ukjent spill.</p>';
             }
         }
+
+        // Funksjon for å stoppe alle aktive spill-looper
+        function stopAllGameLoops() {
+            // Snake game loop
+            if (snakeGameLoopId) {
+                clearTimeout(snakeGameLoopId);
+                snakeGameLoopId = null;
+            }
+            // Add other game loops here if they use requestAnimationFrame or setInterval/setTimeout
+        }
+
 
         // --- Gjett Tallet-spillet ---
         function loadGuessTheNumberGame() {
@@ -670,6 +760,194 @@
             answerMessage.style.color = '#34d399'; // Grønn
         }
 
+        // --- Retro Games Menu ---
+        function loadRetroGamesMenu() {
+            gameArea.innerHTML = `
+                <div class="retro-game-menu">
+                    <button class="retro-game-button" onclick="loadGame('snakeGame')">Snake</button>
+                    <button class="retro-game-button" disabled>Tetris Lite (kommer)</button>
+                    <button class="retro-game-button" disabled>Pac-Man Lite (kommer)</button>
+                    <button class="retro-game-button" disabled>Asteroids Lite (kommer)</button>
+                </div>
+            `;
+        }
+
+        // --- Snake Game ---
+        let snakeCanvas, snakeCtx;
+        const GRID_SIZE = 20; // Size of each square in the grid
+        let snake = [{ x: 10, y: 10 }];
+        let food = {};
+        let dx = 0; // x velocity
+        let dy = 0; // y velocity
+        let score = 0;
+        let changingDirection = false;
+        let snakeGameLoopId = null; // To store setTimeout ID for pausing/resetting
+
+        function loadSnakeGame() {
+            gameArea.innerHTML = `
+                <div id="snakeGame" class="w-full max-w-lg bg-gray-800 p-6 rounded-xl shadow-lg flex flex-col items-center">
+                    <h2 class="text-2xl font-bold text-blue-400 mb-4">Snake</h2>
+                    <canvas id="snakeCanvas" width="400" height="400"></canvas>
+                    <div id="snakeGameControls" class="mt-4">
+                        <button onclick="startGame()">Start Spill</button>
+                        <button onclick="pauseGame()">Pause/Fortsett</button>
+                        <button onclick="resetSnakeGame()">Nytt Spill</button>
+                    </div>
+                    <p id="snakeScore" class="mt-4">Poeng: 0</p>
+                </div>
+            `;
+            snakeCanvas = document.getElementById('snakeCanvas');
+            snakeCtx = snakeCanvas.getContext('2d');
+            resetSnakeGame(); // Initialize game state
+            document.addEventListener('keydown', changeDirection); // Listen for arrow keys
+        }
+
+        function createFood() {
+            food = {
+                x: Math.floor(Math.random() * (snakeCanvas.width / GRID_SIZE)),
+                y: Math.floor(Math.random() * (snakeCanvas.height / GRID_SIZE))
+            };
+            // Ensure food does not spawn on the snake
+            snake.forEach(part => {
+                if (part.x === food.x && part.y === food.y) {
+                    createFood(); // Recurse if food is on snake
+                }
+            });
+        }
+
+        function drawSnakePart(snakePart) {
+            snakeCtx.fillStyle = '#34d399'; /* Lys grønn */
+            snakeCtx.strokeStyle = '#10b981'; /* Mørkere grønn */
+            snakeCtx.fillRect(snakePart.x * GRID_SIZE, snakePart.y * GRID_SIZE, GRID_SIZE, GRID_SIZE);
+            snakeCtx.strokeRect(snakePart.x * GRID_SIZE, snakePart.y * GRID_SIZE, GRID_SIZE, GRID_SIZE);
+        }
+
+        function drawFood() {
+            snakeCtx.fillStyle = '#f87171'; /* Rød */
+            snakeCtx.strokeStyle = '#ef4444'; /* Mørkere rød */
+            snakeCtx.fillRect(food.x * GRID_SIZE, food.y * GRID_SIZE, GRID_SIZE, GRID_SIZE);
+            snakeCtx.strokeRect(food.x * GRID_SIZE, food.y * GRID_SIZE, GRID_SIZE, GRID_SIZE);
+        }
+
+        function draw() {
+            snakeCtx.clearRect(0, 0, snakeCanvas.width, snakeCanvas.height);
+            drawFood();
+            snake.forEach(drawSnakePart);
+        }
+
+        function advanceSnake() {
+            if (!snakeGameLoopId && (dx === 0 && dy === 0)) return; // Game paused/not started
+
+            const head = { x: snake[0].x + dx, y: snake[0].y + dy };
+
+            // Check for collision with walls or self
+            if (
+                head.x < 0 || head.x * GRID_SIZE >= snakeCanvas.width ||
+                head.y < 0 || head.y * GRID_SIZE >= snakeCanvas.height ||
+                checkCollision(head)
+            ) {
+                gameOver();
+                return;
+            }
+
+            snake.unshift(head); // Add new head
+
+            const didEatFood = head.x === food.x && head.y === food.y;
+            if (didEatFood) {
+                score += 10;
+                document.getElementById('snakeScore').textContent = `Poeng: ${score}`;
+                createFood(); // Create new food
+            } else {
+                snake.pop(); // Remove tail if no food eaten
+            }
+            changingDirection = false;
+        }
+
+        function checkCollision(head) {
+            // Check if snake head collides with any part of its body
+            for (let i = 1; i < snake.length; i++) {
+                if (head.x === snake[i].x && head.y === snake[i].y) return true;
+            }
+            return false;
+        }
+
+        function changeDirection(event) {
+            const LEFT_KEY = 37;
+            const RIGHT_KEY = 39;
+            const UP_KEY = 38;
+            const DOWN_KEY = 40;
+
+            if (changingDirection) return; // Prevent rapid multiple key presses
+            changingDirection = true;
+
+            const keyPressed = event.keyCode;
+            const goingUp = dy === -1;
+            const goingDown = dy === 1;
+            const goingLeft = dx === -1;
+            const goingRight = dx === 1;
+
+            if (keyPressed === LEFT_KEY && !goingRight) {
+                dx = -1;
+                dy = 0;
+            }
+            if (keyPressed === UP_KEY && !goingDown) {
+                dx = 0;
+                dy = -1;
+            }
+            if (keyPressed === RIGHT_KEY && !goingLeft) {
+                dx = 1;
+                dy = 0;
+            }
+            if (keyPressed === DOWN_KEY && !goingUp) {
+                dx = 0;
+                dy = 1;
+            }
+        }
+
+        function gameLoop() {
+            snakeGameLoopId = setTimeout(function onTick() {
+                advanceSnake();
+                draw();
+                gameLoop(); // Call itself recursively
+            }, 100); // Game speed (lower is faster)
+        }
+
+        function startGame() {
+            if (snakeGameLoopId === null) { // Only start if not already running
+                if (dx === 0 && dy === 0) { // If game just reset or never started, give initial direction
+                     dx = 1; // Start moving right
+                }
+                gameLoop();
+            }
+        }
+
+        function pauseGame() {
+            if (snakeGameLoopId) {
+                clearTimeout(snakeGameLoopId);
+                snakeGameLoopId = null;
+            } else {
+                startGame(); // Resume
+            }
+        }
+
+        function resetSnakeGame() {
+            clearTimeout(snakeGameLoopId); // Stop current game loop
+            snakeGameLoopId = null;
+            snake = [{ x: 10, y: 10 }]; // Reset snake position
+            dx = 0; // Reset direction
+            dy = 0;
+            score = 0;
+            document.getElementById('snakeScore').textContent = `Poeng: ${score}`;
+            createFood(); // Place new food
+            draw(); // Initial draw
+        }
+
+        function gameOver() {
+            clearTimeout(snakeGameLoopId);
+            snakeGameLoopId = null;
+            alert("Game Over! Ditt poeng: " + score); // Simple alert for now
+            resetSnakeGame();
+        }
 
         // Laster "Gjett Tallet"-spillet automatisk når siden lastes som standard
         window.onload = () => loadGame('guessTheNumber');
