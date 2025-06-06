@@ -134,6 +134,114 @@
             color: #d1d5db; /* Lysere grå tekst */
         }
 
+        /* Spesifikke stiler for "Spørsmålsspill" */
+        #questionGame h2 {
+            font-size: 2.25rem;
+            font-weight: bold;
+            color: #fca311; /* Oransje tittel for spillet */
+            margin-bottom: 1.5rem;
+        }
+        #questionGame #questionDisplay {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #e0e7ff; /* Lysere tekst for spørsmål */
+            min-height: 3em; /* Sikrer litt plass selv med kort spørsmål */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #questionGame input[type="text"] {
+            background-color: #6b7280;
+            color: #f3f4f6;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            border: 1px solid #4b5563;
+            width: 100%;
+            max-width: 300px;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-size: 1.25rem;
+            focus:outline-none focus:ring-2 focus:ring-yellow-500;
+        }
+        #questionGame .button-group button {
+            background-image: linear-gradient(to right, #f59e0b, #d97706); /* Oransje gradient knapp */
+            margin: 0.5rem;
+        }
+        #questionGame #scoreDisplay {
+            margin-top: 1rem;
+            font-size: 1rem;
+            color: #d1d5db;
+        }
+        #questionGame #answerMessage {
+            margin-top: 1rem;
+            font-size: 1.125rem;
+            font-weight: 500;
+        }
+        #leaderboard-container {
+            background-color: #374151; /* Mørkere grå */
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            width: 100%;
+            max-width: 400px; /* Begrenset bredde for lesbarhet */
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+            text-align: left;
+        }
+        #leaderboard-container h3 {
+            font-size: 1.75rem;
+            font-weight: bold;
+            color: #fca311; /* Oransje tittel */
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        #leaderboard-container ol {
+            list-style: none; /* Fjern standard liste-prikker */
+            padding: 0;
+            margin: 0;
+        }
+        #leaderboard-container li {
+            background-color: #4b5563; /* Litt lysere grå for liste-elementer */
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1rem;
+            color: #e0e7ff;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        #leaderboard-container li:last-child {
+            margin-bottom: 0;
+        }
+        #leaderboard-container .leaderboard-score {
+            font-weight: bold;
+            color: #34d399; /* Grønn for poeng */
+        }
+        #nicknameInputContainer {
+            margin-top: 1.5rem;
+            background-color: #6b7280;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        #nicknameInputContainer input {
+            background-color: #4b5563;
+            border: 1px solid #374151;
+            color: #f3f4f6;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+        }
+        #nicknameInputContainer button {
+            background-image: linear-gradient(to right, #8b5cf6, #a78bfa); /* Lilla gradient */
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            font-weight: 500;
+        }
+
+
         footer {
             text-align: center;
             margin-top: 2rem;
@@ -150,12 +258,18 @@
             h1 {
                 font-size: 2.25rem;
             }
-            #guessTheNumberGame h2 {
+            #guessTheNumberGame h2, #questionGame h2 {
                 font-size: 1.75rem;
             }
             .game-button {
                 width: 100%;
                 max-width: none;
+            }
+            #questionGame #questionDisplay {
+                font-size: 1.25rem;
+            }
+            #questionGame input[type="text"] {
+                max-width: 100%;
             }
         }
     </style>
@@ -169,6 +283,7 @@
 
         <nav class="game-menu">
             <button class="game-button" onclick="loadGame('guessTheNumber')">Gjett Tallet</button>
+            <button class="game-button" onclick="loadGame('questionGame')">Spørsmålsspill</button>
             <button class="game-button" onclick="loadGame('anotherGame')" disabled>Et Annet Spill (kommer)</button>
             <!-- Legg til flere spillknapper her -->
         </nav>
@@ -194,6 +309,9 @@
             switch (gameName) {
                 case 'guessTheNumber':
                     loadGuessTheNumberGame();
+                    break;
+                case 'questionGame':
+                    loadQuestionGame();
                     break;
                 case 'anotherGame':
                     gameArea.innerHTML = '<h2 class="text-2xl text-yellow-400">Dette spillet kommer snart!</h2><p class="mt-2 text-gray-300">Følg med for mer moro.</p>';
@@ -275,7 +393,285 @@
             console.log("Secret number (for testing):", secretNumber); // Fjern denne i et ekte spill!
         }
 
-        // Laster "Gjett Tallet"-spillet automatisk når siden lastes
+        // --- Spørsmålsspillet ---
+        let questions = [];
+        let currentQuestionIndex;
+        let correctAnswers = 0;
+        let totalQuestionsAsked = 0;
+        const LEADERBOARD_KEY = 'questionGameLeaderboard'; // Nøkkel for localStorage
+
+        // Shuffle function (Fisher-Yates)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+            }
+        }
+
+        function loadQuestionGame() {
+            gameArea.innerHTML = `
+                <div id="questionGame" class="w-full max-w-lg bg-gray-700 p-8 rounded-xl shadow-lg flex flex-col items-center">
+                    <h2 class="mb-6">Spørsmålsspill!</h2>
+                    <p id="questionDisplay" class="mb-4"></p>
+                    <input type="text" id="answerInput" placeholder="Skriv inn ditt svar her" class="focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                    <div class="button-group flex justify-center mt-4">
+                        <button onclick="checkQuestionAnswer()">Svar</button>
+                        <button onclick="nextQuestion()" class="bg-gray-600 hover:bg-gray-500">Neste Spørsmål</button>
+                    </div>
+                    <p id="answerMessage" class="text-gray-200 mt-4"></p>
+                    <p id="scoreDisplay" class="text-gray-400 mt-2">Poeng: 0 / 0</p>
+                    <button onclick="resetQuestionGame()" class="mt-6 bg-red-600 hover:bg-red-700 w-full">Start Nytt Spill</button>
+                </div>
+
+                <div id="leaderboard-container" class="mt-8">
+                    <h3>Resultatliste</h3>
+                    <ol id="leaderboardList"></ol>
+                </div>
+            `;
+
+            initializeQuestionGame();
+            loadAndDisplayLeaderboard(); // Last og vis resultatliste ved oppstart
+        }
+
+        function initializeQuestionGame() {
+            // Definer en stor spørsmålsbase
+            const allQuestions = [
+                { question: "Hva er hovedstaden i Norge?", answer: "Oslo" },
+                { question: "Hvilket grunnstoff har kjemisk symbol 'O'?", answer: "Oksygen" },
+                { question: "Hva heter verdens største hav?", answer: "Stillehavet" },
+                { question: "Hvilken planet er kjent som 'Den røde planet'?", answer: "Mars" },
+                { question: "Hvem skrev 'Peer Gynt'?", answer: "Henrik Ibsen" },
+                { question: "Hvor mange dager er det i et skuddår?", answer: "366" },
+                { question: "Hva er resultatet av 7 x 8?", answer: "56" },
+                { question: "Hvilken fugl er et symbol for fred?", answer: "Due" },
+                { question: "Hva heter den høyeste fjelltoppen i verden?", answer: "Mount Everest" },
+                { question: "Hvilket dyr gir oss ull?", answer: "Sau" },
+                { question: "Hva heter Norges lengste elv?", answer: "Glomma" },
+                { question: "Hvilken farge får du hvis du blander blått og gult?", answer: "Grønn" },
+                { question: "Hva heter det største organet i menneskekroppen?", answer: "Hud" },
+                { question: "Hva heter valutaen i Japan?", answer: "Yen" },
+                { question: "Hvilken sport bruker en puck?", answer: "Ishockey" },
+                { question: "Hva er hovedstaden i Sverige?", answer: "Stockholm" },
+                { question: "Hvilken måned har 28 dager (utenom skuddår)?", answer: "Februar" },
+                { question: "Hva heter dyret som er en 'kongle-spiser'?", answer: "Eikenøtt" },
+                { question: "Hva er motsatt av 'kald'?", answer: "Varm" },
+                { question: "Hvilken by er kjent for Eiffeltårnet?", answer: "Paris" },
+                { question: "Hva heter havnen i Bergen?", answer: "Bryggen" },
+                { question: "Hvilket instrument har 88 tangenter?", answer: "Piano" },
+                { question: "Hva er et annet navn for et 'sekskantet' objekt?", answer: "Heksagon" },
+                { question: "Hvilken type frukt er en banan?", answer: "Bær" },
+                { question: "Hva er den største ørkenen i verden?", answer: "Sahara" },
+                { question: "Hvem malte 'Skrik'?", answer: "Edvard Munch" },
+                { question: "Hva heter Norges nasjonalfugl?", answer: "Fossekall" },
+                { question: "Hvor mange bein har en edderkopp?", answer: "8" },
+                { question: "Hva er den offisielle hovedstaden i Canada?", answer: "Ottawa" },
+                { question: "Hvilket hav skiller Europa og Afrika?", answer: "Middelhavet" },
+                { question: "Hva heter fiktive karakteren som bor i en ananas under havet?", answer: "Svampebob Firkant" },
+                { question: "Hva er det høyeste bygget i verden?", answer: "Burj Khalifa" },
+                { question: "Hvilken farge er solsikker?", answer: "Gul" },
+                { question: "Hva heter det første mennesket på månen?", answer: "Neil Armstrong" },
+                { question: "Hvilket land er kjent for pizza og pasta?", answer: "Italia" },
+                { question: "Hva er en gruppe løver kalt?", answer: "Stolthet" },
+                { question: "Hvilken metall er flytende ved romtemperatur?", answer: "Kvikksølv" },
+                { question: "Hva er hovedstaden i Tyskland?", answer: "Berlin" },
+                { question: "Hva heter det største pattedyr i verden?", answer: "Blåhval" },
+                { question: "Hva er det mest vanlige navnet i verden?", answer: "Mohammed" },
+                { question: "Hva heter elven som renner gjennom London?", answer: "Themsen" },
+                { question: "Hva er det minste landet i verden?", answer: "Vatikanstaten" },
+                { question: "Hva heter den største øya i verden?", answer: "Grønland" },
+                { question: "Hva er hovedingrediensen i guacamole?", answer: "Avocado" },
+                { question: "Hvilken planet er nærmest solen?", answer: "Mercur" },
+                { question: "Hva er det kjemiske symbolet for vann?", answer: "H2O" },
+                { question: "Hvilken farge er himmelen på en klar dag?", answer: "Blå" },
+                { question: "Hvilket dyr er kjent for å bygge demninger?", answer: "Bever" },
+                { question: "Hva heter sporten der man kaster en javelin?", answer: "Spydkast" },
+                { question: "Hvilken del av et tre leder vann opp til bladene?", answer: "Stamme" }
+            ];
+
+            questions = [...allQuestions]; // Lag en kopi
+            shuffleArray(questions);
+            currentQuestionIndex = -1; // Start før første spørsmål
+            correctAnswers = 0;
+            totalQuestionsAsked = 0;
+            nextQuestion(); // Last inn det første spørsmålet
+            updateQuestionScore();
+        }
+
+        function displayQuestion() {
+            const questionDisplay = document.getElementById('questionDisplay');
+            const answerInput = document.getElementById('answerInput');
+            const answerMessage = document.getElementById('answerMessage');
+
+            // Skjul eventuell input for kallenavn
+            const nicknameInputContainer = document.getElementById('nicknameInputContainer');
+            if (nicknameInputContainer) {
+                nicknameInputContainer.remove();
+            }
+
+            if (currentQuestionIndex < questions.length) {
+                questionDisplay.textContent = questions[currentQuestionIndex].question;
+                answerInput.value = '';
+                answerInput.disabled = false;
+                answerMessage.textContent = '';
+                answerInput.focus();
+            } else {
+                // Spill slutt
+                questionDisplay.textContent = `Spillet er ferdig! Du svarte riktig på ${correctAnswers} av ${totalQuestionsAsked} spørsmål.`;
+                answerInput.disabled = true;
+                answerMessage.textContent = '';
+
+                // Sjekk om poengsummen er god nok for resultatlisten
+                loadAndDisplayLeaderboard(); // Last for å få siste liste
+                const currentLeaderboard = getLeaderboard();
+                const lowestScoreOnLeaderboard = currentLeaderboard.length < 5 ? -1 : currentLeaderboard[currentLeaderboard.length - 1].score;
+
+                if (correctAnswers > lowestScoreOnLeaderboard) {
+                    showNicknameInput();
+                } else {
+                    setTimeout(() => {
+                        answerMessage.textContent = "Prøv igjen for å komme på resultatlisten!";
+                        answerMessage.style.color = '#facc15'; // Gul
+                    }, 1000);
+                }
+            }
+        }
+
+        function checkQuestionAnswer() {
+            const answerInput = document.getElementById('answerInput');
+            const answerMessage = document.getElementById('answerMessage');
+            const userAnswer = answerInput.value.trim().toLowerCase();
+            const correctAnswer = questions[currentQuestionIndex].answer.trim().toLowerCase();
+
+            // Sjekk om svar allerede er gitt for dette spørsmålet
+            if (answerInput.disabled) {
+                return;
+            }
+
+            totalQuestionsAsked++; // Teller antall spørsmål besvart
+
+            if (userAnswer === correctAnswer) {
+                answerMessage.textContent = "Riktig svar! 🎉";
+                answerMessage.style.color = '#34d399'; /* grønn */
+                correctAnswers++;
+            } else {
+                answerMessage.textContent = `Feil svar. Svaret var: ${questions[currentQuestionIndex].answer}`;
+                answerMessage.style.color = '#f87171'; /* rød */
+            }
+            answerInput.disabled = true; // Deaktiver input etter svar
+            updateQuestionScore();
+        }
+
+        function nextQuestion() {
+            const answerMessage = document.getElementById('answerMessage');
+            const answerInput = document.getElementById('answerInput');
+
+            // Hvis spørsmål ikke er svart på, tell det som feil
+            if (currentQuestionIndex >= 0 && !answerInput.disabled && currentQuestionIndex < questions.length) {
+                 totalQuestionsAsked++;
+                 answerMessage.textContent = `Du hoppet over dette. Svaret var: ${questions[currentQuestionIndex].answer}`;
+                 answerMessage.style.color = '#facc15'; /* gul */
+                 updateQuestionScore();
+            }
+
+            currentQuestionIndex++;
+            displayQuestion();
+        }
+
+        function updateQuestionScore() {
+            document.getElementById('scoreDisplay').textContent = `Poeng: ${correctAnswers} / ${totalQuestionsAsked}`;
+        }
+
+        function resetQuestionGame() {
+            initializeQuestionGame();
+            document.getElementById('answerMessage').textContent = '';
+        }
+
+        // --- Resultatliste (Leaderboard) funksjoner ---
+        function getLeaderboard() {
+            const leaderboardJson = localStorage.getItem(LEADERBOARD_KEY);
+            return leaderboardJson ? JSON.parse(leaderboardJson) : [];
+        }
+
+        function saveLeaderboard(leaderboardData) {
+            localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(leaderboardData));
+        }
+
+        function addScoreToLeaderboard(nickname, score, total) {
+            let leaderboard = getLeaderboard();
+            leaderboard.push({ nickname: nickname, score: score, totalQuestions: total });
+
+            // Sorter etter poeng (synkende), deretter etter totalt antall spørsmål (stigende for å bryte bånd)
+            leaderboard.sort((a, b) => {
+                if (b.score !== a.score) {
+                    return b.score - a.score;
+                }
+                return a.totalQuestions - b.totalQuestions; // Færre spørsmål for samme score vinner
+            });
+
+            // Behold kun de 5 beste
+            leaderboard = leaderboard.slice(0, 5);
+            saveLeaderboard(leaderboard);
+            loadAndDisplayLeaderboard(); // Oppdater visningen
+        }
+
+        function loadAndDisplayLeaderboard() {
+            const leaderboardList = document.getElementById('leaderboardList');
+            if (!leaderboardList) return; // Sjekk om elementet eksisterer
+
+            const leaderboard = getLeaderboard();
+            leaderboardList.innerHTML = ''; // Tømmer listen
+
+            if (leaderboard.length === 0) {
+                leaderboardList.innerHTML = '<li class="text-center text-gray-400">Ingen resultater ennå. Spill for å komme på listen!</li>';
+                return;
+            }
+
+            leaderboard.forEach((entry, index) => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `
+                    <span>${index + 1}. ${entry.nickname}</span>
+                    <span class="leaderboard-score">${entry.score} / ${entry.totalQuestions}</span>
+                `;
+                leaderboardList.appendChild(listItem);
+            });
+        }
+
+        function showNicknameInput() {
+            const questionGameDiv = document.getElementById('questionGame');
+            const nicknameInputContainer = document.createElement('div');
+            nicknameInputContainer.id = 'nicknameInputContainer';
+            nicknameInputContainer.className = 'mt-6 bg-gray-600 p-4 rounded-lg shadow-md w-full max-w-md'; // Mindre enn spillets div
+            nicknameInputContainer.innerHTML = `
+                <p class="text-white mb-2">Gratulerer! Skriv inn ditt kallenavn for resultatlisten:</p>
+                <input type="text" id="nicknameInput" placeholder="Kallenavn" class="w-full mb-2">
+                <button onclick="submitNickname()" class="w-full">Lagre Poengsum</button>
+            `;
+            questionGameDiv.appendChild(nicknameInputContainer);
+            document.getElementById('nicknameInput').focus();
+        }
+
+        function submitNickname() {
+            const nicknameInput = document.getElementById('nicknameInput');
+            let nickname = nicknameInput.value.trim();
+
+            if (nickname === "") {
+                nickname = "Anonym"; // Standard kallenavn hvis tom
+            }
+
+            addScoreToLeaderboard(nickname, correctAnswers, totalQuestionsAsked);
+
+            // Fjern kallenavninput og gi tilbakemelding
+            const nicknameInputContainer = document.getElementById('nicknameInputContainer');
+            if (nicknameInputContainer) {
+                nicknameInputContainer.remove();
+            }
+            const answerMessage = document.getElementById('answerMessage');
+            answerMessage.textContent = `Poengsum lagret under ${nickname}!`;
+            answerMessage.style.color = '#34d399'; // Grønn
+        }
+
+
+        // Laster "Gjett Tallet"-spillet automatisk når siden lastes som standard
         window.onload = () => loadGame('guessTheNumber');
 
     </script>
